@@ -1,0 +1,29 @@
+modLoader="javafml"
+loaderVersion="[37,)"
+license="MIT"
+issueTrackerURL="https://github.com/Ketheroth/Uncrafter/issues"
+[[mods]]
+modId="uncrafter"
+version="1.17.1-0.1.0"
+displayName="Uncrafter"
+updateJSONURL="https://ketheroth.github.io/mods/uncrafter.json"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/uncrafter"
+logoFile="logo.png"
+authors="Ketheroth"
+description='''
+Allow items to be uncrafted
+'''
+itemIcon="uncrafter:uncrafter"
+
+[[dependencies.uncrafter]]
+    modId="forge"
+    mandatory=true
+    versionRange="[37,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.uncrafter]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.17.1,1.18)"
+    ordering="NONE"
+    side="BOTH"
