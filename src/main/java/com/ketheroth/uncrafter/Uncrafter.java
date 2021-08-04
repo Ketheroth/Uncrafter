@@ -1,12 +1,15 @@
 package com.ketheroth.uncrafter;
 
 import com.ketheroth.uncrafter.client.gui.screen.inventory.UncrafterScreen;
+import com.ketheroth.uncrafter.common.config.Configuration;
 import com.ketheroth.uncrafter.core.registry.UncrafterBlocks;
 import com.ketheroth.uncrafter.core.registry.UncrafterContainerTypes;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
@@ -25,6 +28,8 @@ public class Uncrafter {
 		modEventBus.addListener(this::clientSetup);
 //		modEventBus.addListener(this::enqueueIMC);
 //		modEventBus.addListener(this::processIMC);
+
+		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Configuration.CONFIG);
 
 		UncrafterBlocks.BLOCKS.register(modEventBus);
 		UncrafterBlocks.ITEMS.register(modEventBus);

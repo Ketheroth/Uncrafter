@@ -1,5 +1,6 @@
 package com.ketheroth.uncrafter.common.inventory.container;
 
+import com.ketheroth.uncrafter.common.config.Configuration;
 import com.ketheroth.uncrafter.core.registry.UncrafterContainerTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,6 +22,7 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 public class UncrafterContainer extends AbstractContainerMenu {
 
@@ -167,7 +169,7 @@ public class UncrafterContainer extends AbstractContainerMenu {
 							Recipe<?> recipe = searchRecipe(stack);
 							if (recipe != null) {
 								List<ItemStack> list = recipe.getIngredients().stream().collect(ArrayList::new,
-										(accumulator, ingredient) -> accumulator.add(ingredient.isEmpty() ? ItemStack.EMPTY : ingredient.getItems()[0]),
+										(accumulator, ingredient) -> accumulator.add(ingredient.isEmpty() ? ItemStack.EMPTY : ingredient.getItems()[new Random().nextInt(ingredient.getItems().length)]),
 										ArrayList::addAll);
 								cache.setA(stack.getItem());
 								cache.setB(list);
@@ -206,6 +208,7 @@ public class UncrafterContainer extends AbstractContainerMenu {
 		RecipeManager recipeManager = this.player.level.getRecipeManager();
 		Optional<Recipe<?>> optionalRecipe = recipeManager.getRecipes().stream()
 				.filter(recipe -> recipe.getType().equals(RecipeType.CRAFTING))
+				.filter(recipe -> !Configuration.BLACKLIST.get().contains(recipe.getId().toString()))
 				.filter(recipe -> recipe.canCraftInDimensions(3, 3)
 						&& recipe.getResultItem().getItem() == inputItem
 						&& !recipe.getIngredients().isEmpty())
