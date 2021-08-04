@@ -1,0 +1,28 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"igi",
+		"pfp",
+		"ooo"
+	],
+	"key": {
+		"i": {
+			"item": "minecraft:iron_ingot"
+		},
+		"g": {
+			"item": "minecraft:glass"
+		},
+		"p": {
+			"item": "minecraft:dark_prismarine"
+		},
+		"f": {
+			"item": "minecraft:fire_charge"
+		},
+		"o": {
+			"item": "minecraft:crying_obsidian"
+		}
+	},
+	"result": {
+		"item": "uncrafter:uncrafter"
+	}
+}
