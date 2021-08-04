@@ -191,14 +191,34 @@ public class UncrafterContainer extends AbstractContainerMenu {
 
 	private ItemStackHandler createOutputHandler() {
 		return new ItemStackHandler(9) {
+			private int extracted = 0;
+
 			@Nonnull
 			@Override
 			public ItemStack extractItem(int slot, int amount, boolean simulate) {
 				//first we extract the chosen stack
-				ItemStack extracted = super.extractItem(slot, amount, simulate);
+				ItemStack extractedStack = super.extractItem(slot, amount, simulate);
+				if (!simulate) {
+					extracted++;
+				}
 				//then we remove one item from the input stack
-				inputItems.extractItem(0, amount, simulate);
-				return extracted;
+				System.out.println(simulate + ": " + extracted + ";" + Configuration.EXTRACT_AMOUNT.get());
+				if (extracted >= Configuration.EXTRACT_AMOUNT.get() || this.isEmpty()) {
+					inputItems.extractItem(0, amount, simulate);
+					if (!simulate) {
+						extracted = 0;
+					}
+				}
+				return extractedStack;
+			}
+
+			private boolean isEmpty() {
+				for (int i = 0; i < this.getSlots(); i++) {
+					if (!this.getStackInSlot(i).isEmpty()) {
+						return false;
+					}
+				}
+				return true;
 			}
 		};
 	}

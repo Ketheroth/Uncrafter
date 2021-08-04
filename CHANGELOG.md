@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - A server configuration to blacklist recipes that shouldn't be inverted.
 The default blacklist has some recipes to avoid item duplication.
 If you find more recipe that lead to duplication, please tell me, so I can add them to the default blacklist.
+- A server configuration to change the max amount of item that can be retrieved while uncrafting an item.
 
 ## Changed
 - The recipe is now easier
