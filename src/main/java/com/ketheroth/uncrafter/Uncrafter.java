@@ -30,7 +30,6 @@ public class Uncrafter {
 		final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
 		modEventBus.addListener(this::clientSetup);
-		modEventBus.addListener(this::enqueueIMC);
 		modEventBus.addListener(this::processIMC);
 
 		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Configuration.CONFIG);
@@ -46,10 +45,6 @@ public class Uncrafter {
 		MenuScreens.register(UncrafterContainerTypes.UNCRAFTER_CONTAINER.get(), UncrafterScreen::new);
 	}
 
-	private void enqueueIMC(final InterModEnqueueEvent event) {
-		InterModComms.sendTo("uncrafter", "blacklistedRecipes", () -> List.of("minecraft:iron_block"));
-	}
-
 	private void processIMC(final InterModProcessEvent event) {
 		event.getIMCStream().filter(message -> message.method().equals("blacklistedRecipes")).forEach(message -> {
 			try {
@@ -58,7 +53,6 @@ public class Uncrafter {
 			} catch (ClassCastException e) {
 				LOGGER.error("Error receiving IMC from : " + message.modId());
 			}
-			Configuration.IMC_BLACKLIST.forEach(System.out::println);
 		});
 	}
 
