@@ -1,5 +1,6 @@
 package com.ketheroth.uncrafter.common.config;
 
+import com.google.common.collect.Lists;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.util.List;
@@ -11,11 +12,13 @@ public class Configuration {
 	public static ForgeConfigSpec.ConfigValue<List<String>> BLACKLIST;
 	public static ForgeConfigSpec.ConfigValue<Integer> EXTRACT_AMOUNT;
 
+	public static List<String> IMC_BLACKLIST = Lists.newArrayList();
+
 	static {
 		ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
 		BLACKLIST = BUILDER.comment("Blacklisted crafting recipe. Recipes in the list won't be allowed to be reversed in the uncrafter.")
-				.define("blacklist", List.of(
+				.define("blacklist", Lists.newArrayList(
 						"minecraft:coal", "minecraft:copper_ingot", "minecraft:copper_ingot_from_waxed_copper_block",
 						"minecraft:diamond", "minecraft:emerald", "minecraft:gold_ingot_from_gold_block",
 						"minecraft:gold_nugget", "minecraft:iron_ingot_from_iron_block", "minecraft:iron_nugget",

@@ -229,6 +229,7 @@ public class UncrafterContainer extends AbstractContainerMenu {
 		Optional<Recipe<?>> optionalRecipe = recipeManager.getRecipes().stream()
 				.filter(recipe -> recipe.getType().equals(RecipeType.CRAFTING))
 				.filter(recipe -> !Configuration.BLACKLIST.get().contains(recipe.getId().toString()))
+				.filter(recipe -> !Configuration.IMC_BLACKLIST.contains(recipe.getId().toString()))
 				.filter(recipe -> recipe.canCraftInDimensions(3, 3)
 						&& recipe.getResultItem().getItem() == inputItem
 						&& !recipe.getIngredients().isEmpty())
