@@ -2,17 +2,17 @@ package com.ketheroth.uncrafter.common.inventory.container;
 
 import com.ketheroth.uncrafter.common.config.Configuration;
 import com.ketheroth.uncrafter.core.registry.UncrafterContainerTypes;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.IRecipeType;
+import net.minecraft.item.crafting.RecipeManager;
 import net.minecraft.util.Tuple;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
@@ -24,16 +24,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-public class UncrafterContainer extends AbstractContainerMenu {
+public class UncrafterContainer extends Container {
 
 	private BlockPos pos;
-	private Player player;
+	private PlayerEntity player;
 	private IItemHandler playerInventory;
-	private Tuple<Item, List<ItemStack>> cache = new Tuple<>(null, null);
-	private ItemStackHandler inputItems = createInputHandler();
+	private Tuple<ItemStack, List<ItemStack>> cache = new Tuple<>(ItemStack.EMPTY, new ArrayList<>());
 	private ItemStackHandler outputItems = createOutputHandler();
+	private ItemStackHandler inputItems = createInputHandler();
 
-	public UncrafterContainer(int windowId, Inventory playerInventory, Player player, BlockPos pos) {
+	public UncrafterContainer(int windowId, PlayerInventory playerInventory, PlayerEntity player, BlockPos pos) {
 		super(UncrafterContainerTypes.UNCRAFTER_CONTAINER.get(), windowId);
 		this.pos = pos;
 		this.player = player;
@@ -57,17 +57,17 @@ public class UncrafterContainer extends AbstractContainerMenu {
 	}
 
 	@Override
-	public boolean stillValid(Player player) {
+	public boolean stillValid(PlayerEntity player) {
 		return player.distanceToSqr(pos.getX(), pos.getY(), pos.getZ()) <= 16.0D;
 	}
 
 	@Override
-	public void removed(Player player) {
-		if (player instanceof ServerPlayer) {
+	public void removed(PlayerEntity player) {
+		if (player instanceof ServerPlayerEntity) {
 			ItemStack itemstack = this.inputItems.extractItem(0, 64, false);
 			if (!itemstack.isEmpty()) {
-				if (player.isAlive() && !((ServerPlayer) player).hasDisconnected()) {
-					player.getInventory().placeItemBackInInventory(itemstack);
+				if (player.isAlive() && !((ServerPlayerEntity) player).hasDisconnected()) {
+					player.inventory.placeItemBackInInventory(this.player.level, itemstack);
 				} else {
 					player.drop(itemstack, false);
 				}
@@ -76,7 +76,7 @@ public class UncrafterContainer extends AbstractContainerMenu {
 	}
 
 	@Override
-	public ItemStack quickMoveStack(Player playerIn, int index) {
+	public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
 		return ItemStack.EMPTY;
 //		ItemStack itemstack = ItemStack.EMPTY;
 //		Slot slot = this.slots.get(index);
@@ -131,16 +131,15 @@ public class UncrafterContainer extends AbstractContainerMenu {
 				for (int i = 0; i < 9; i++) {
 					outputItems.setStackInSlot(i, ItemStack.EMPTY);
 				}
-				if (!stack.is(cache.getA())) {
-					Recipe<?> recipe = searchRecipe(stack);
+				if (!stack.sameItem(cache.getA())) {
+					IRecipe<?> recipe = searchRecipe(stack);
 					if (recipe != null) {
 						List<ItemStack> list = recipe.getIngredients().stream().collect(ArrayList::new,
 								(accumulator, ingredient) -> accumulator.add(ingredient.isEmpty() ? ItemStack.EMPTY : ingredient.getItems()[0]),
 								ArrayList::addAll);
-						cache.setA(stack.getItem());
-						cache.setB(list);
+						cache = new Tuple<>(stack, list);
 					} else {
-						cache.setB(new ArrayList<>());
+						cache = new Tuple<>(cache.getA(), new ArrayList<>());
 					}
 				}
 				//add ingredient items
@@ -165,16 +164,15 @@ public class UncrafterContainer extends AbstractContainerMenu {
 					}
 					if (this.getStackInSlot(slot).getCount() > amount) {
 						ItemStack stack = this.getStackInSlot(0);
-						if (!stack.is(cache.getA())) {
-							Recipe<?> recipe = searchRecipe(stack);
+						if (!stack.sameItem(cache.getA())) {
+							IRecipe<?> recipe = searchRecipe(stack);
 							if (recipe != null) {
 								List<ItemStack> list = recipe.getIngredients().stream().collect(ArrayList::new,
 										(accumulator, ingredient) -> accumulator.add(ingredient.isEmpty() ? ItemStack.EMPTY : ingredient.getItems()[new Random().nextInt(ingredient.getItems().length)]),
 										ArrayList::addAll);
-								cache.setA(stack.getItem());
-								cache.setB(list);
+								cache = new Tuple<>(stack, list);
 							} else {
-								cache.setB(new ArrayList<>());
+								cache = new Tuple<>(cache.getA(), new ArrayList<>());
 							}
 						}
 						int index = 0;
@@ -202,7 +200,6 @@ public class UncrafterContainer extends AbstractContainerMenu {
 					extracted++;
 				}
 				//then we remove one item from the input stack
-				System.out.println(simulate + ": " + extracted + ";" + Configuration.EXTRACT_AMOUNT.get());
 				if (extracted >= Configuration.EXTRACT_AMOUNT.get() || this.isEmpty()) {
 					inputItems.extractItem(0, amount, simulate);
 					if (!simulate) {
@@ -223,21 +220,18 @@ public class UncrafterContainer extends AbstractContainerMenu {
 		};
 	}
 
-	private Recipe<?> searchRecipe(ItemStack input) {
+	private IRecipe<?> searchRecipe(ItemStack input) {
 		Item inputItem = input.getItem();
 		RecipeManager recipeManager = this.player.level.getRecipeManager();
-		Optional<Recipe<?>> optionalRecipe = recipeManager.getRecipes().stream()
-				.filter(recipe -> recipe.getType().equals(RecipeType.CRAFTING))
+		Optional<IRecipe<?>> optionalRecipe = recipeManager.getRecipes().stream()
+				.filter(recipe -> recipe.getType().equals(IRecipeType.CRAFTING))
 				.filter(recipe -> !Configuration.BLACKLIST.get().contains(recipe.getId().toString()))
 				.filter(recipe -> !Configuration.IMC_BLACKLIST.contains(recipe.getId().toString()))
 				.filter(recipe -> recipe.canCraftInDimensions(3, 3)
 						&& recipe.getResultItem().getItem() == inputItem
 						&& !recipe.getIngredients().isEmpty())
 				.findAny();
-		if (optionalRecipe.isEmpty()) {
-			return null;
-		}
-		return optionalRecipe.get();
+		return optionalRecipe.orElse(null);
 	}
 
 }

@@ -4,15 +4,13 @@ import com.ketheroth.uncrafter.client.gui.screen.inventory.UncrafterScreen;
 import com.ketheroth.uncrafter.common.config.Configuration;
 import com.ketheroth.uncrafter.core.registry.UncrafterBlocks;
 import com.ketheroth.uncrafter.core.registry.UncrafterContainerTypes;
-import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
@@ -42,16 +40,16 @@ public class Uncrafter {
 	}
 
 	private void clientSetup(final FMLClientSetupEvent event) {
-		MenuScreens.register(UncrafterContainerTypes.UNCRAFTER_CONTAINER.get(), UncrafterScreen::new);
+		ScreenManager.register(UncrafterContainerTypes.UNCRAFTER_CONTAINER.get(), UncrafterScreen::new);
 	}
 
 	private void processIMC(final InterModProcessEvent event) {
-		event.getIMCStream().filter(message -> message.method().equals("blacklistedRecipes")).forEach(message -> {
+		event.getIMCStream().filter(message -> message.getMethod().equals("blacklistedRecipes")).forEach(message -> {
 			try {
-				List<?> recipes = (List<?>) message.messageSupplier().get();
+				List<?> recipes = (List<?>) message.getMessageSupplier().get();
 				recipes.stream().map(String.class::cast).forEach(recipe -> Configuration.IMC_BLACKLIST.add(recipe));
 			} catch (ClassCastException e) {
-				LOGGER.error("Error receiving IMC from : " + message.modId());
+				LOGGER.error("Error receiving IMC from : " + message.getModId());
 			}
 		});
 	}
