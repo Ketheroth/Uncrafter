@@ -11,6 +11,7 @@ public class Configuration {
 
 	public static ForgeConfigSpec.ConfigValue<List<String>> BLACKLIST;
 	public static ForgeConfigSpec.ConfigValue<Integer> EXTRACT_AMOUNT;
+	public static ForgeConfigSpec.ConfigValue<Integer> ADVANCED_EXTRACT_AMOUNT;
 
 	public static List<String> IMC_BLACKLIST = Lists.newArrayList();
 
@@ -56,8 +57,11 @@ public class Configuration {
 						"minecraft:waxed_weathered_cut_copper_slab", "minecraft:weathered_cut_copper_slab"
 				));
 
-		EXTRACT_AMOUNT = BUILDER.comment("Amount of item one can extract from one item (default=1)")
+		EXTRACT_AMOUNT = BUILDER.comment("Amount of ingredients that can be retrieved in the uncrafter (default=1)")
 				.define("extractAmount", 1);
+
+		ADVANCED_EXTRACT_AMOUNT = BUILDER.comment("Amount of ingredients that can be retrieved in the advanced uncrafter (default=3)")
+				.define("advancedExtractAmount", 3);
 
 		CONFIG = BUILDER.build();
 	}

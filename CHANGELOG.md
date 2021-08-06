@@ -12,6 +12,9 @@ A little cross appears on the input slot when it is locked.
 ### Changed
 - Changed the texture again (it's better now).
 
+### Fixed
+- Uncrafter having end stone as bottom texture instead of crying obsidian
+
 ## 1.17.1-0.2.0
 
 ### Added

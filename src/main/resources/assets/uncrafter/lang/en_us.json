@@ -1,4 +1,6 @@
 {
 	"screen.uncrafter.uncrafter_inventory": "Uncrafter",
-	"block.uncrafter.uncrafter": "Uncrafter"
+	"screen.uncrafter.advanced_uncrafter_inventory": "Advanced Uncrafter",
+	"block.uncrafter.uncrafter": "Uncrafter",
+	"block.uncrafter.advanced_uncrafter": "Advanced Uncrafter"
 }

@@ -1,0 +1,32 @@
+{
+	"parent": "minecraft:recipes/root",
+	"rewards": {
+		"recipes": [
+			"uncrafter:advanced_uncrafter"
+		]
+	},
+	"criteria": {
+		"has_block": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"item": "uncrafter:uncrafter"
+					}
+				]
+			}
+		},
+		"has_the_recipe": {
+			"trigger": "minecraft:recipe_unlocked",
+			"conditions": {
+				"recipe": "uncrafter:advanced_uncrafter"
+			}
+		}
+	},
+	"requirements": [
+		[
+			"has_block",
+			"has_the_recipe"
+		]
+	]
+}

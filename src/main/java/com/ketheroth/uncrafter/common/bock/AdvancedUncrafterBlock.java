@@ -1,6 +1,6 @@
 package com.ketheroth.uncrafter.common.bock;
 
-import com.ketheroth.uncrafter.common.inventory.container.UncrafterContainer;
+import com.ketheroth.uncrafter.common.inventory.container.AdvancedUncrafterContainer;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -23,9 +23,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @SuppressWarnings("deprecation")
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class UncrafterBlock extends Block {
+public class AdvancedUncrafterBlock extends Block {
 
-	public UncrafterBlock(Properties properties) {
+	public AdvancedUncrafterBlock(Properties properties) {
 		super(properties);
 	}
 
@@ -38,12 +38,12 @@ public class UncrafterBlock extends Block {
 		MenuProvider provider = new MenuProvider() {
 			@Override
 			public Component getDisplayName() {
-				return new TranslatableComponent("screen.uncrafter.uncrafter_inventory");
+				return new TranslatableComponent("screen.uncrafter.advanced_uncrafter_inventory");
 			}
 
 			@Override
 			public AbstractContainerMenu createMenu(int windowId, Inventory inventory, Player player) {
-				return new UncrafterContainer(windowId, inventory, player, pos);
+				return new AdvancedUncrafterContainer(windowId, inventory, player, pos);
 			}
 		};
 

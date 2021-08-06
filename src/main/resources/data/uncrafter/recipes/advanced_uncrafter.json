@@ -1,0 +1,28 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"ici",
+		"pup",
+		"eee"
+	],
+	"key": {
+		"i": {
+			"item": "minecraft:netherite_ingot"
+		},
+		"c": {
+			"item": "minecraft:end_crystal"
+		},
+		"u": {
+			"item": "uncrafter:uncrafter"
+		},
+		"p": {
+			"item": "minecraft:dark_prismarine"
+		},
+		"e": {
+			"item": "minecraft:end_stone"
+		}
+	},
+	"result": {
+		"item": "uncrafter:advanced_uncrafter"
+	}
+}

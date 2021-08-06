@@ -1,6 +1,7 @@
 {
 	"replace": false,
 	"values": [
-		"uncrafter:uncrafter"
+		"uncrafter:uncrafter",
+		"uncrafter:advanced_uncrafter"
 	]
 }
