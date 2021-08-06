@@ -1,5 +1,6 @@
 package com.ketheroth.uncrafter.common.inventory.container;
 
+import com.ketheroth.uncrafter.common.config.Configuration;
 import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
@@ -55,7 +56,7 @@ public class InputHandler extends ItemStackHandler {
 		}
 		if (container.isAdvanced() && container.getEnchantmentHandler() != null && stack.isEnchanted()) {
 			ArrayList<ItemStack> books = new ArrayList<>();
-			EnchantmentHelper.getEnchantments(stack).forEach((enchantment, level) -> books.add(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchantment, level))));
+			EnchantmentHelper.getEnchantments(stack).forEach((enchantment, level) -> books.add(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchantment, Configuration.MINIMUM_LEVEL_FOR_ENCHANTMENTS.get() ? 1 : level))));
 			Collections.shuffle(books);
 			for (int i = 0; i < 6 && i < books.size(); i++) {
 				container.getEnchantmentHandler().setStackInSlot(i, books.get(i));
@@ -102,7 +103,7 @@ public class InputHandler extends ItemStackHandler {
 				}
 				if (container.isAdvanced() && container.getEnchantmentHandler() != null && stack.isEnchanted()) {
 					ArrayList<ItemStack> books = new ArrayList<>();
-					EnchantmentHelper.getEnchantments(stack).forEach((enchantment, level) -> books.add(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchantment, level))));
+					EnchantmentHelper.getEnchantments(stack).forEach((enchantment, level) -> books.add(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchantment, Configuration.MINIMUM_LEVEL_FOR_ENCHANTMENTS.get() ? 1 : level))));
 					Collections.shuffle(books);
 					for (int i = 0; i < 6 && i < books.size(); i++) {
 						container.getEnchantmentHandler().setStackInSlot(i, books.get(i));

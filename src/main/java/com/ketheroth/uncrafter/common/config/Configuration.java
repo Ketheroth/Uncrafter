@@ -13,6 +13,7 @@ public class Configuration {
 	public static ForgeConfigSpec.ConfigValue<Integer> EXTRACT_AMOUNT;
 	public static ForgeConfigSpec.ConfigValue<Integer> ADVANCED_EXTRACT_AMOUNT;
 	public static ForgeConfigSpec.ConfigValue<Integer> ENCHANTMENT_EXTRACT_AMOUNT;
+	public static ForgeConfigSpec.ConfigValue<Boolean> MINIMUM_LEVEL_FOR_ENCHANTMENTS;
 
 	public static List<String> IMC_BLACKLIST = Lists.newArrayList();
 
@@ -66,6 +67,9 @@ public class Configuration {
 
 		ENCHANTMENT_EXTRACT_AMOUNT = BUILDER.comment("Amount of enchantment that can be retrieved in the advanced uncrafter (default=3)")
 				.define("enchantmentExtractAmount", 3);
+
+		MINIMUM_LEVEL_FOR_ENCHANTMENTS = BUILDER.comment("Determine if the enchantments keep their level or are reduced to their first level")
+				.define("minimumLevelForEnchantments", false);
 
 		CONFIG = BUILDER.build();
 	}

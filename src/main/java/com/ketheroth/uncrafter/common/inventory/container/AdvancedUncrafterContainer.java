@@ -39,7 +39,7 @@ public class AdvancedUncrafterContainer extends AbstractContainerMenu implements
 		this.playerInventory = new InvWrapper(playerInventory);
 		this.outputItems = new OutputHandler(9, this);
 		this.inputItems = new InputHandler(1, this);
-		this.enchantmentHandler = new EnchantmentHandler(6, this);
+		this.enchantmentHandler = new EnchantmentHandler(6);
 		//layout player inventory
 		for (int y = 0; y < 3; y++) {
 			for (int x = 0; x < 9; x++) {

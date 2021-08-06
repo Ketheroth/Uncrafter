@@ -8,12 +8,10 @@ import javax.annotation.Nonnull;
 
 public class EnchantmentHandler extends ItemStackHandler {
 
-	private final IUncrafterContainer container;
 	private int extracted;
 
-	public EnchantmentHandler(int size, IUncrafterContainer container) {
+	public EnchantmentHandler(int size) {
 		super(size);
-		this.container = container;
 		this.extracted = 0;
 	}
 
