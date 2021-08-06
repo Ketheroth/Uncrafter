@@ -54,9 +54,14 @@ public class InputHandler extends ItemStackHandler {
 			container.getOutputHandler().setStackInSlot(index, ingredient.copy());
 			index++;
 		}
+		//add enchantments
 		if (container.isAdvanced() && container.getEnchantmentHandler() != null && stack.isEnchanted()) {
 			ArrayList<ItemStack> books = new ArrayList<>();
-			EnchantmentHelper.getEnchantments(stack).forEach((enchantment, level) -> books.add(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchantment, Configuration.MINIMUM_LEVEL_FOR_ENCHANTMENTS.get() ? 1 : level))));
+			EnchantmentHelper.getEnchantments(stack).forEach((enchantment, level) -> {
+				if (!enchantment.isCurse()) {
+					books.add(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchantment, Configuration.MINIMUM_LEVEL_FOR_ENCHANTMENTS.get() ? 1 : level)));
+				}
+			});
 			Collections.shuffle(books);
 			for (int i = 0; i < 6 && i < books.size(); i++) {
 				container.getEnchantmentHandler().setStackInSlot(i, books.get(i));

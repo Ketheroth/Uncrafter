@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## Unreleased
 
 ### Added
-- Advanced Uncrafter. Allow three ingredients to be retrieved. Allow three enchantments to be retrieved (as an enchanted book).
+- Advanced Uncrafter. Allow three ingredients to be retrieved. Allow three enchantments to be retrieved (as an enchanted book), but you can't retrieve a curse.
 - When extracting an ingredient from the output slots, the input slot is locked until you have taken all possible ingredients.
 A little cross appears on the input slot when it is locked.
 
