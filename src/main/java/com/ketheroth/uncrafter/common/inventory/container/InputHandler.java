@@ -1,11 +1,15 @@
 package com.ketheroth.uncrafter.common.inventory.container;
 
+import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -25,6 +29,12 @@ public class InputHandler extends ItemStackHandler {
 		for (int i = 0; i < 9; i++) {
 			container.getOutputHandler().setStackInSlot(i, ItemStack.EMPTY);
 		}
+		if (container.isAdvanced() && container.getEnchantmentHandler() != null) {
+			for (int i = 0; i < 6; i++) {
+				container.getEnchantmentHandler().setStackInSlot(i, ItemStack.EMPTY);
+			}
+			container.getEnchantmentHandler().resetExtracting();
+		}
 		if (!stack.is(container.getCache().getA())) {
 			Recipe<?> recipe = UncrafterContainer.searchRecipe(stack, container.getRecipeManager());
 			if (recipe != null) {
@@ -43,6 +53,14 @@ public class InputHandler extends ItemStackHandler {
 			container.getOutputHandler().setStackInSlot(index, ingredient.copy());
 			index++;
 		}
+		if (container.isAdvanced() && container.getEnchantmentHandler() != null && stack.isEnchanted()) {
+			ArrayList<ItemStack> books = new ArrayList<>();
+			EnchantmentHelper.getEnchantments(stack).forEach((enchantment, level) -> books.add(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchantment, level))));
+			Collections.shuffle(books);
+			for (int i = 0; i < 6 && i < books.size(); i++) {
+				container.getEnchantmentHandler().setStackInSlot(i, books.get(i));
+			}
+		}
 		return super.insertItem(slot, stack, simulate);
 	}
 
@@ -56,6 +74,12 @@ public class InputHandler extends ItemStackHandler {
 		if (!simulate) {
 			for (int i = 0; i < 9; i++) {
 				container.getOutputHandler().setStackInSlot(i, ItemStack.EMPTY);
+			}
+			if (container.isAdvanced() && container.getEnchantmentHandler() != null) {
+				for (int i = 0; i < 6; i++) {
+					container.getEnchantmentHandler().setStackInSlot(i, ItemStack.EMPTY);
+				}
+				container.getEnchantmentHandler().resetExtracting();
 			}
 			if (this.getStackInSlot(slot).getCount() > amount) {
 				ItemStack stack = this.getStackInSlot(0);
@@ -75,6 +99,14 @@ public class InputHandler extends ItemStackHandler {
 				for (ItemStack ingredient : container.getCache().getB()) {
 					container.getOutputHandler().setStackInSlot(index, ingredient.copy());
 					index++;
+				}
+				if (container.isAdvanced() && container.getEnchantmentHandler() != null && stack.isEnchanted()) {
+					ArrayList<ItemStack> books = new ArrayList<>();
+					EnchantmentHelper.getEnchantments(stack).forEach((enchantment, level) -> books.add(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchantment, level))));
+					Collections.shuffle(books);
+					for (int i = 0; i < 6 && i < books.size(); i++) {
+						container.getEnchantmentHandler().setStackInSlot(i, books.get(i));
+					}
 				}
 			}
 		}

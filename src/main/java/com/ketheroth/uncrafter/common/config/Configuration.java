@@ -12,6 +12,7 @@ public class Configuration {
 	public static ForgeConfigSpec.ConfigValue<List<String>> BLACKLIST;
 	public static ForgeConfigSpec.ConfigValue<Integer> EXTRACT_AMOUNT;
 	public static ForgeConfigSpec.ConfigValue<Integer> ADVANCED_EXTRACT_AMOUNT;
+	public static ForgeConfigSpec.ConfigValue<Integer> ENCHANTMENT_EXTRACT_AMOUNT;
 
 	public static List<String> IMC_BLACKLIST = Lists.newArrayList();
 
@@ -62,6 +63,9 @@ public class Configuration {
 
 		ADVANCED_EXTRACT_AMOUNT = BUILDER.comment("Amount of ingredients that can be retrieved in the advanced uncrafter (default=3)")
 				.define("advancedExtractAmount", 3);
+
+		ENCHANTMENT_EXTRACT_AMOUNT = BUILDER.comment("Amount of enchantment that can be retrieved in the advanced uncrafter (default=3)")
+				.define("enchantmentExtractAmount", 3);
 
 		CONFIG = BUILDER.build();
 	}

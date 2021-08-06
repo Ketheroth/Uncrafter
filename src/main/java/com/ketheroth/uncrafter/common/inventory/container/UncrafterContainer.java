@@ -50,7 +50,7 @@ public class UncrafterContainer extends AbstractContainerMenu implements IUncraf
 			}
 		}
 		for (int i = 0; i < 9; i++) {
-			this.addSlot(new SlotItemHandler(this.playerInventory, i, 8 + 18 * i, 196));
+			this.addSlot(new SlotItemHandler(this.playerInventory, i, 8 + 18 * i, 142));
 		}
 		//layout output inventory
 		for (int y = 0; y < 3; y++) {
@@ -133,6 +133,11 @@ public class UncrafterContainer extends AbstractContainerMenu implements IUncraf
 	}
 
 	@Override
+	public EnchantmentHandler getEnchantmentHandler() {
+		return null;
+	}
+
+	@Override
 	public Tuple<Item, List<ItemStack>> getCache() {
 		return this.cache;
 	}
@@ -140,6 +145,11 @@ public class UncrafterContainer extends AbstractContainerMenu implements IUncraf
 	@Override
 	public RecipeManager getRecipeManager() {
 		return this.player.level.getRecipeManager();
+	}
+
+	@Override
+	public boolean isAdvanced() {
+		return false;
 	}
 
 	@Nullable

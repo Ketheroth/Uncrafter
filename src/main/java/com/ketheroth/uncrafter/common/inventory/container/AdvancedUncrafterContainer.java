@@ -12,6 +12,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
@@ -28,16 +29,17 @@ public class AdvancedUncrafterContainer extends AbstractContainerMenu implements
 	private final IItemHandler playerInventory;
 	private final OutputHandler outputItems;
 	private final InputHandler inputItems;
+	private final EnchantmentHandler enchantmentHandler;
 	private Tuple<Item, List<ItemStack>> cache = new Tuple<>(null, null);
 
 	public AdvancedUncrafterContainer(int windowId, Inventory playerInventory, Player player, BlockPos pos) {
-		super(UncrafterContainerTypes.UNCRAFTER_CONTAINER.get(), windowId);
+		super(UncrafterContainerTypes.ADVANCED_UNCRAFTER_CONTAINER.get(), windowId);
 		this.pos = pos;
 		this.player = player;
 		this.playerInventory = new InvWrapper(playerInventory);
 		this.outputItems = new OutputHandler(9, this);
 		this.inputItems = new InputHandler(1, this);
-
+		this.enchantmentHandler = new EnchantmentHandler(6, this);
 		//layout player inventory
 		for (int y = 0; y < 3; y++) {
 			for (int x = 0; x < 9; x++) {
@@ -45,12 +47,12 @@ public class AdvancedUncrafterContainer extends AbstractContainerMenu implements
 			}
 		}
 		for (int i = 0; i < 9; i++) {
-			addSlot(new SlotItemHandler(this.playerInventory, i, 8 + 18 * i, 196));
+			addSlot(new SlotItemHandler(this.playerInventory, i, 8 + 18 * i, 142));
 		}
 		//layout output inventory
 		for (int y = 0; y < 3; y++) {
 			for (int x = 0; x < 3; x++) {
-				addSlot(new SlotItemHandler(this.outputItems, 3 * y + x, 93 + 18 * x, 17 + 18 * y) {
+				addSlot(new SlotItemHandler(this.outputItems, 3 * y + x, 70 + 18 * x, 17 + 18 * y) {
 					@Override
 					public boolean mayPlace(@Nonnull ItemStack stack) {
 						return false;
@@ -59,17 +61,28 @@ public class AdvancedUncrafterContainer extends AbstractContainerMenu implements
 			}
 		}
 		//layout input inventory
-		addSlot(new SlotItemHandler(this.inputItems, 0, 35, 35) {
+		addSlot(new SlotItemHandler(this.inputItems, 0, 12, 35) {
 			@Override
 			public boolean mayPickup(Player playerIn) {
-				return !AdvancedUncrafterContainer.this.outputItems.isExtracting() && super.mayPickup(playerIn);
+				return !AdvancedUncrafterContainer.this.isInputLocked() && super.mayPickup(playerIn);
 			}
 		});
+
+		for (int y = 0; y < 3; y++) {
+			for (int x = 0; x < 2; x++) {
+				addSlot(new SlotItemHandler(this.enchantmentHandler, 2 * y + x, 134 + 18 * x, 17 + 18 * y) {
+					@Override
+					public boolean mayPlace(@Nonnull ItemStack stack) {
+						return false;
+					}
+				});
+			}
+		}
 	}
 
 	@Override
 	public boolean stillValid(Player player) {
-		return player.distanceToSqr(pos.getX(), pos.getY(), pos.getZ()) <= 16.0D;
+		return player.distanceToSqr(this.pos.getX(), this.pos.getY(), this.pos.getZ()) <= 16.0D;
 	}
 
 	@Override
@@ -77,7 +90,7 @@ public class AdvancedUncrafterContainer extends AbstractContainerMenu implements
 		if (player instanceof ServerPlayer) {
 			ItemStack itemstack = this.inputItems.extractItem(0, 64, false);
 			if (!itemstack.isEmpty()) {
-				if (!outputItems.isExtracting()) {
+				if (!this.outputItems.isExtracting()) {
 					if (player.isAlive() && !((ServerPlayer) player).hasDisconnected()) {
 						player.getInventory().placeItemBackInInventory(itemstack);
 					} else {
@@ -114,27 +127,37 @@ public class AdvancedUncrafterContainer extends AbstractContainerMenu implements
 
 	@Override
 	public boolean isInputLocked() {
-		return outputItems.isExtracting();
+		return this.outputItems.isExtracting() || this.enchantmentHandler.isExtracting();
 	}
 
 	@Override
 	public OutputHandler getOutputHandler() {
-		return outputItems;
+		return this.outputItems;
 	}
 
 	@Override
 	public InputHandler getInputHandler() {
-		return inputItems;
+		return this.inputItems;
+	}
+
+	@Override
+	public EnchantmentHandler getEnchantmentHandler() {
+		return this.enchantmentHandler;
 	}
 
 	@Override
 	public Tuple<Item, List<ItemStack>> getCache() {
-		return cache;
+		return this.cache;
 	}
 
 	@Override
 	public RecipeManager getRecipeManager() {
-		return player.level.getRecipeManager();
+		return this.player.level.getRecipeManager();
+	}
+
+	@Override
+	public boolean isAdvanced() {
+		return true;
 	}
 
 }

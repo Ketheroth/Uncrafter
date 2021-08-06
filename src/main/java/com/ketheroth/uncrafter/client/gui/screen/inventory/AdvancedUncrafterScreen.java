@@ -12,7 +12,7 @@ import net.minecraft.world.entity.player.Inventory;
 
 public class AdvancedUncrafterScreen extends AbstractContainerScreen<AdvancedUncrafterContainer> {
 
-	private final ResourceLocation GUI = new ResourceLocation(Uncrafter.MODID, "textures/gui/uncrafter_gui.png");
+	private final ResourceLocation GUI = new ResourceLocation(Uncrafter.MODID, "textures/gui/advanced_uncrafter_gui.png");
 
 	public AdvancedUncrafterScreen(AdvancedUncrafterContainer container, Inventory inventory, Component name) {
 		super(container, inventory, name);
@@ -26,7 +26,7 @@ public class AdvancedUncrafterScreen extends AbstractContainerScreen<AdvancedUnc
 		if (this.menu.isInputLocked()) {
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			RenderSystem.setShaderTexture(0, GUI);
-			this.blit(poseStack, (this.width - this.imageWidth) / 2 + 51, (this.height - this.imageHeight) / 2 + 51, 176, 0, 3, 3);
+			this.blit(poseStack, (this.width - this.imageWidth) / 2 + 28, (this.height - this.imageHeight) / 2 + 51, 176, 0, 3, 3);
 		}
 	}
 
