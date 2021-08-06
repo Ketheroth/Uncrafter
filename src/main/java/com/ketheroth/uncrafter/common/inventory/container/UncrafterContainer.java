@@ -30,8 +30,8 @@ public class UncrafterContainer extends AbstractContainerMenu {
 	private Player player;
 	private IItemHandler playerInventory;
 	private Tuple<Item, List<ItemStack>> cache = new Tuple<>(null, null);
-	private ItemStackHandler inputItems = createInputHandler();
-	private ItemStackHandler outputItems = createOutputHandler();
+	private OutputHandler outputItems = new OutputHandler(9);
+	private InputHandler inputItems = new InputHandler(1);
 
 	public UncrafterContainer(int windowId, Inventory playerInventory, Player player, BlockPos pos) {
 		super(UncrafterContainerTypes.UNCRAFTER_CONTAINER.get(), windowId);
@@ -53,7 +53,12 @@ public class UncrafterContainer extends AbstractContainerMenu {
 				index++;
 			}
 		}
-		addSlot(new SlotItemHandler(inputItems, 0, 35, 35));
+		addSlot(new SlotItemHandler(inputItems, 0, 35, 35) {
+			@Override
+			public boolean mayPickup(Player playerIn) {
+				return outputItems.extracted == 0 && super.mayPickup(playerIn);
+			}
+		});
 	}
 
 	@Override
@@ -66,10 +71,12 @@ public class UncrafterContainer extends AbstractContainerMenu {
 		if (player instanceof ServerPlayer) {
 			ItemStack itemstack = this.inputItems.extractItem(0, 64, false);
 			if (!itemstack.isEmpty()) {
-				if (player.isAlive() && !((ServerPlayer) player).hasDisconnected()) {
-					player.getInventory().placeItemBackInInventory(itemstack);
-				} else {
-					player.drop(itemstack, false);
+				if (outputItems.extracted == 0) {
+					if (player.isAlive() && !((ServerPlayer) player).hasDisconnected()) {
+						player.getInventory().placeItemBackInInventory(itemstack);
+					} else {
+						player.drop(itemstack, false);
+					}
 				}
 			}
 		}
@@ -122,107 +129,6 @@ public class UncrafterContainer extends AbstractContainerMenu {
 		addSlotRange(playerInventory, 0, x, y, 9, 18);
 	}
 
-	private ItemStackHandler createInputHandler() {
-		return new ItemStackHandler(1) {
-			@Nonnull
-			@Override
-			public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-				//when an item is inserted, we set the output slots, then we insert the stack in the input
-				for (int i = 0; i < 9; i++) {
-					outputItems.setStackInSlot(i, ItemStack.EMPTY);
-				}
-				if (!stack.is(cache.getA())) {
-					Recipe<?> recipe = searchRecipe(stack);
-					if (recipe != null) {
-						List<ItemStack> list = recipe.getIngredients().stream().collect(ArrayList::new,
-								(accumulator, ingredient) -> accumulator.add(ingredient.isEmpty() ? ItemStack.EMPTY : ingredient.getItems()[0]),
-								ArrayList::addAll);
-						cache.setA(stack.getItem());
-						cache.setB(list);
-					} else {
-						cache.setB(new ArrayList<>());
-					}
-				}
-				//add ingredient items
-				int index = 0;
-				for (ItemStack ingredient : cache.getB()) {
-					outputItems.setStackInSlot(index, ingredient.copy());
-					index++;
-				}
-				return super.insertItem(slot, stack, simulate);
-			}
-
-			@Nonnull
-			@Override
-			public ItemStack extractItem(int slot, int amount, boolean simulate) {
-				//when an item is extracted
-				//- we clear the output slots
-				//- if input !empty we refill the output slots with the recipe
-				//then we remove the items from the input stack
-				if (!simulate) {
-					for (int i = 0; i < 9; i++) {
-						outputItems.setStackInSlot(i, ItemStack.EMPTY);
-					}
-					if (this.getStackInSlot(slot).getCount() > amount) {
-						ItemStack stack = this.getStackInSlot(0);
-						if (!stack.is(cache.getA())) {
-							Recipe<?> recipe = searchRecipe(stack);
-							if (recipe != null) {
-								List<ItemStack> list = recipe.getIngredients().stream().collect(ArrayList::new,
-										(accumulator, ingredient) -> accumulator.add(ingredient.isEmpty() ? ItemStack.EMPTY : ingredient.getItems()[new Random().nextInt(ingredient.getItems().length)]),
-										ArrayList::addAll);
-								cache.setA(stack.getItem());
-								cache.setB(list);
-							} else {
-								cache.setB(new ArrayList<>());
-							}
-						}
-						int index = 0;
-						for (ItemStack ingredient : cache.getB()) {
-							outputItems.setStackInSlot(index, ingredient.copy());
-							index++;
-						}
-					}
-				}
-				return super.extractItem(slot, amount, simulate);
-			}
-		};
-	}
-
-	private ItemStackHandler createOutputHandler() {
-		return new ItemStackHandler(9) {
-			private int extracted = 0;
-
-			@Nonnull
-			@Override
-			public ItemStack extractItem(int slot, int amount, boolean simulate) {
-				//first we extract the chosen stack
-				ItemStack extractedStack = super.extractItem(slot, amount, simulate);
-				if (!simulate) {
-					extracted++;
-				}
-				//then we remove one item from the input stack
-				System.out.println(simulate + ": " + extracted + ";" + Configuration.EXTRACT_AMOUNT.get());
-				if (extracted >= Configuration.EXTRACT_AMOUNT.get() || this.isEmpty()) {
-					inputItems.extractItem(0, amount, simulate);
-					if (!simulate) {
-						extracted = 0;
-					}
-				}
-				return extractedStack;
-			}
-
-			private boolean isEmpty() {
-				for (int i = 0; i < this.getSlots(); i++) {
-					if (!this.getStackInSlot(i).isEmpty()) {
-						return false;
-					}
-				}
-				return true;
-			}
-		};
-	}
-
 	private Recipe<?> searchRecipe(ItemStack input) {
 		Item inputItem = input.getItem();
 		RecipeManager recipeManager = this.player.level.getRecipeManager();
@@ -238,6 +144,119 @@ public class UncrafterContainer extends AbstractContainerMenu {
 			return null;
 		}
 		return optionalRecipe.get();
+	}
+
+	public boolean isInputLocked() {
+		return outputItems.extracted != 0;
+	}
+
+	private class OutputHandler extends ItemStackHandler {
+
+		private int extracted;
+
+		public OutputHandler(int size) {
+			super(size);
+			extracted = 0;
+		}
+
+		@Nonnull
+		@Override
+		public ItemStack extractItem(int slot, int amount, boolean simulate) {
+			//first we extract the chosen stack
+			ItemStack extractedStack = super.extractItem(slot, amount, simulate);
+			if (!simulate) {
+				extracted++;
+			}
+			//then we remove one item from the input stack
+			if (extracted >= Configuration.EXTRACT_AMOUNT.get() || this.isEmpty()) {
+				inputItems.extractItem(0, amount, simulate);
+				if (!simulate) {
+					extracted = 0;
+				}
+			}
+			return extractedStack;
+		}
+
+		private boolean isEmpty() {
+			for (int i = 0; i < this.getSlots(); i++) {
+				if (!this.getStackInSlot(i).isEmpty()) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+	}
+
+	private class InputHandler extends ItemStackHandler {
+
+		public InputHandler(int size) {
+			super(size);
+		}
+
+		@Nonnull
+		@Override
+		public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+			//when an item is inserted, we set the output slots, then we insert the stack in the input
+			for (int i = 0; i < 9; i++) {
+				outputItems.setStackInSlot(i, ItemStack.EMPTY);
+			}
+			if (!stack.is(cache.getA())) {
+				Recipe<?> recipe = searchRecipe(stack);
+				if (recipe != null) {
+					List<ItemStack> list = recipe.getIngredients().stream().collect(ArrayList::new,
+							(accumulator, ingredient) -> accumulator.add(ingredient.isEmpty() ? ItemStack.EMPTY : ingredient.getItems()[0]),
+							ArrayList::addAll);
+					cache.setA(stack.getItem());
+					cache.setB(list);
+				} else {
+					cache.setB(new ArrayList<>());
+				}
+			}
+			//add ingredient items
+			int index = 0;
+			for (ItemStack ingredient : cache.getB()) {
+				outputItems.setStackInSlot(index, ingredient.copy());
+				index++;
+			}
+			return super.insertItem(slot, stack, simulate);
+		}
+
+		@Nonnull
+		@Override
+		public ItemStack extractItem(int slot, int amount, boolean simulate) {
+			//when an item is extracted
+			//- we clear the output slots
+			//- if input !empty we refill the output slots with the recipe
+			//then we remove the items from the input stack
+			if (!simulate) {
+				for (int i = 0; i < 9; i++) {
+					outputItems.setStackInSlot(i, ItemStack.EMPTY);
+				}
+				if (this.getStackInSlot(slot).getCount() > amount) {
+					ItemStack stack = this.getStackInSlot(0);
+					if (!stack.is(cache.getA())) {
+						Recipe<?> recipe = searchRecipe(stack);
+						if (recipe != null) {
+							List<ItemStack> list = recipe.getIngredients().stream().collect(ArrayList::new,
+									(accumulator, ingredient) -> accumulator.add(ingredient.isEmpty() ? ItemStack.EMPTY : ingredient.getItems()[new Random().nextInt(ingredient.getItems().length)]),
+									ArrayList::addAll);
+							cache.setA(stack.getItem());
+							cache.setB(list);
+						} else {
+							cache.setB(new ArrayList<>());
+						}
+					}
+					int index = 0;
+					for (ItemStack ingredient : cache.getB()) {
+						outputItems.setStackInSlot(index, ingredient.copy());
+						index++;
+					}
+				}
+			}
+			return super.extractItem(slot, amount, simulate);
+		}
+
 	}
 
 }

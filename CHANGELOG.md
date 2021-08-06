@@ -5,9 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+### Added
+- When extracting an ingredient from the output slots, the input slot is locked until you have taken all possible ingredients.
+A little cross appears on the input slot when it is locked.
+
 ### Changed
 - Changed the texture again (it's better now).
-
 
 ## 1.17.1-0.2.0
 
