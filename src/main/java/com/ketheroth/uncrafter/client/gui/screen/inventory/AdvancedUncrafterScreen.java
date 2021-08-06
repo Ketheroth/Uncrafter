@@ -2,7 +2,6 @@ package com.ketheroth.uncrafter.client.gui.screen.inventory;
 
 import com.ketheroth.uncrafter.Uncrafter;
 import com.ketheroth.uncrafter.common.inventory.container.AdvancedUncrafterContainer;
-import com.ketheroth.uncrafter.common.inventory.container.UncrafterContainer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -10,6 +9,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@ParametersAreNonnullByDefault
 public class AdvancedUncrafterScreen extends AbstractContainerScreen<AdvancedUncrafterContainer> {
 
 	private final ResourceLocation GUI = new ResourceLocation(Uncrafter.MODID, "textures/gui/advanced_uncrafter_gui.png");

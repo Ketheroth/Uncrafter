@@ -7,15 +7,15 @@ import java.util.List;
 
 public class Configuration {
 
-	public static ForgeConfigSpec CONFIG;
+	public static final ForgeConfigSpec CONFIG;
 
-	public static ForgeConfigSpec.ConfigValue<List<String>> BLACKLIST;
-	public static ForgeConfigSpec.ConfigValue<Integer> EXTRACT_AMOUNT;
-	public static ForgeConfigSpec.ConfigValue<Integer> ADVANCED_EXTRACT_AMOUNT;
-	public static ForgeConfigSpec.ConfigValue<Integer> ENCHANTMENT_EXTRACT_AMOUNT;
-	public static ForgeConfigSpec.ConfigValue<Boolean> MINIMUM_LEVEL_FOR_ENCHANTMENTS;
+	public static final ForgeConfigSpec.ConfigValue<List<String>> BLACKLIST;
+	public static final ForgeConfigSpec.ConfigValue<Integer> EXTRACT_AMOUNT;
+	public static final ForgeConfigSpec.ConfigValue<Integer> ADVANCED_EXTRACT_AMOUNT;
+	public static final ForgeConfigSpec.ConfigValue<Integer> ENCHANTMENT_EXTRACT_AMOUNT;
+	public static final ForgeConfigSpec.ConfigValue<Boolean> MINIMUM_LEVEL_FOR_ENCHANTMENTS;
 
-	public static List<String> IMC_BLACKLIST = Lists.newArrayList();
+	public static final List<String> IMC_BLACKLIST = Lists.newArrayList();
 
 	static {
 		ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();

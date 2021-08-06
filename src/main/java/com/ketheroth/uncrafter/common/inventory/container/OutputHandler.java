@@ -26,7 +26,7 @@ public class OutputHandler extends ItemStackHandler {
 			extracted++;
 		}
 		//then we remove one item from the input stack
-		if (extracted >= Configuration.EXTRACT_AMOUNT.get() || this.isEmpty()) {
+		if (extracted >= (container.isAdvanced() ? Configuration.ADVANCED_EXTRACT_AMOUNT.get() : Configuration.EXTRACT_AMOUNT.get()) || this.isEmpty()) {
 			container.getInputHandler().extractItem(0, amount, simulate);
 			if (!simulate) {
 				extracted = 0;
