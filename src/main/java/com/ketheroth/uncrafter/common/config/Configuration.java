@@ -68,7 +68,7 @@ public class Configuration {
 		ENCHANTMENT_EXTRACT_AMOUNT = BUILDER.comment("Amount of enchantment that can be retrieved in the advanced uncrafter (default=3)")
 				.define("enchantmentExtractAmount", 3);
 
-		MINIMUM_LEVEL_FOR_ENCHANTMENTS = BUILDER.comment("Determine if the enchantments keep their level or are reduced to their first level")
+		MINIMUM_LEVEL_FOR_ENCHANTMENTS = BUILDER.comment("Determine if the enchantments keep their level or are reduced to their first level (default=false)")
 				.define("minimumLevelForEnchantments", false);
 
 		CONFIG = BUILDER.build();
