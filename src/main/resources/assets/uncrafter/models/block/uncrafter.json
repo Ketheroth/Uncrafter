@@ -2,7 +2,7 @@
 	"parent": "minecraft:block/cube_bottom_top",
 	"textures": {
 		"top": "uncrafter:block/uncrafter_top",
-		"bottom": "minecraft:block/end_stone",
+		"bottom": "minecraft:block/crying_obsidian",
 		"side": "uncrafter:block/uncrafter_side"
 	}
 }

@@ -1,7 +1,7 @@
 package com.ketheroth.uncrafter.client.gui.screen.inventory;
 
 import com.ketheroth.uncrafter.Uncrafter;
-import com.ketheroth.uncrafter.common.inventory.container.UncrafterContainer;
+import com.ketheroth.uncrafter.common.inventory.container.AdvancedUncrafterContainer;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -9,11 +9,14 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 
-public class UncrafterScreen extends ContainerScreen<UncrafterContainer> {
+import javax.annotation.ParametersAreNonnullByDefault;
 
-	private ResourceLocation GUI = new ResourceLocation(Uncrafter.MODID, "textures/gui/uncrafter_gui.png");
+@ParametersAreNonnullByDefault
+public class AdvancedUncrafterScreen extends ContainerScreen<AdvancedUncrafterContainer> {
 
-	public UncrafterScreen(UncrafterContainer container, PlayerInventory inventory, ITextComponent name) {
+	private final ResourceLocation GUI = new ResourceLocation(Uncrafter.MODID, "textures/gui/advanced_uncrafter_gui.png");
+
+	public AdvancedUncrafterScreen(AdvancedUncrafterContainer container, PlayerInventory inventory, ITextComponent name) {
 		super(container, inventory, name);
 	}
 
@@ -22,6 +25,11 @@ public class UncrafterScreen extends ContainerScreen<UncrafterContainer> {
 		this.renderBackground(poseStack);
 		super.render(poseStack, mouseX, mouseY, partialTicks);
 		this.renderTooltip(poseStack, mouseX, mouseY);
+		if (this.menu.isInputLocked()) {
+			RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+			this.minecraft.getTextureManager().bind(GUI);
+			this.blit(poseStack, (this.width - this.imageWidth) / 2 + 28, (this.height - this.imageHeight) / 2 + 51, 176, 0, 3, 3);
+		}
 	}
 
 	@Override

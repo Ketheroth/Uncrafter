@@ -1,5 +1,6 @@
 package com.ketheroth.uncrafter;
 
+import com.ketheroth.uncrafter.client.gui.screen.inventory.AdvancedUncrafterScreen;
 import com.ketheroth.uncrafter.client.gui.screen.inventory.UncrafterScreen;
 import com.ketheroth.uncrafter.common.config.Configuration;
 import com.ketheroth.uncrafter.core.registry.UncrafterBlocks;
@@ -41,6 +42,7 @@ public class Uncrafter {
 
 	private void clientSetup(final FMLClientSetupEvent event) {
 		ScreenManager.register(UncrafterContainerTypes.UNCRAFTER_CONTAINER.get(), UncrafterScreen::new);
+		ScreenManager.register(UncrafterContainerTypes.ADVANCED_UNCRAFTER_CONTAINER.get(), AdvancedUncrafterScreen::new);
 	}
 
 	private void processIMC(final InterModProcessEvent event) {

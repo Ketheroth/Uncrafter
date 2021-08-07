@@ -1,6 +1,6 @@
 package com.ketheroth.uncrafter.common.bock;
 
-import com.ketheroth.uncrafter.common.inventory.container.UncrafterContainer;
+import com.ketheroth.uncrafter.common.inventory.container.AdvancedUncrafterContainer;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -18,15 +18,14 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @SuppressWarnings("deprecation")
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class UncrafterBlock extends Block {
+public class AdvancedUncrafterBlock extends Block {
 
-	public UncrafterBlock(Properties properties) {
+	public AdvancedUncrafterBlock(Properties properties) {
 		super(properties);
 	}
 
@@ -39,12 +38,12 @@ public class UncrafterBlock extends Block {
 		INamedContainerProvider provider = new INamedContainerProvider() {
 			@Override
 			public ITextComponent getDisplayName() {
-				return new TranslationTextComponent("screen.uncrafter.uncrafter_inventory");
+				return new TranslationTextComponent("screen.uncrafter.advanced_uncrafter_inventory");
 			}
 
 			@Override
 			public Container createMenu(int windowId, PlayerInventory inventory, PlayerEntity player) {
-				return new UncrafterContainer(windowId, inventory, player, pos);
+				return new AdvancedUncrafterContainer(windowId, inventory, player, pos);
 			}
 		};
 

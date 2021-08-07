@@ -4,7 +4,7 @@ license="MIT"
 issueTrackerURL="https://github.com/Ketheroth/Uncrafter/issues"
 [[mods]]
 modId="uncrafter"
-version="1.16.5-0.2.0"
+version="1.16.5-0.3.0"
 displayName="Uncrafter"
 updateJSONURL="https://ketheroth.github.io/mods/uncrafter.json"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/uncrafter"
@@ -13,7 +13,7 @@ authors="Ketheroth"
 description='''
 Allow items to be uncrafted
 '''
-itemIcon="uncrafter:uncrafter"
+itemIcon="uncrafter:advanced_uncrafter"
 
 [[dependencies.uncrafter]]
     modId="forge"

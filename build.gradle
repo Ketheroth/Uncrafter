@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.16.5-0.2.0'
+version = mcversion + '-' + modversion
 group = 'com.ketheroth.uncrafter'
 archivesBaseName = 'Uncrafter'
 
@@ -21,7 +21,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
-   mappings channel: 'parchment', version: '2021.07.27-1.16.5'
+   mappings channel: mappingchannel, version: mappingversion + '-' + mcversion
 
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -92,7 +92,7 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.2.2'
+    minecraft 'net.minecraftforge:forge:' + mcversion + '-' + forgeversion
 
     // Real examples
     // compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
