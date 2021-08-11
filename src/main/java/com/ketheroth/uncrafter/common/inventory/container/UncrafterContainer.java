@@ -163,10 +163,7 @@ public class UncrafterContainer extends AbstractContainerMenu implements IUncraf
 						&& recipe.getResultItem().getItem() == inputItem
 						&& !recipe.getIngredients().isEmpty())
 				.findAny();
-		if (optionalRecipe.isEmpty()) {
-			return null;
-		}
-		return optionalRecipe.get();
+		return optionalRecipe.orElse(null);
 	}
 
 }

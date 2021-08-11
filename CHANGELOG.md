@@ -3,10 +3,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## Unreleased
+
+### Fixed
+- Unable to get enchanted books after removing every ingredient
+- Enchanted book duplication.
+
 ## 1.17.1-0.3.0
 
 ### Added
-- Advanced Uncrafter. Allow three ingredients to be retrieved. Allow three enchantments to be retrieved (as an enchanted book), but you can't retrieve a curse.
+- Advanced Uncrafter. Allow three ingredients to be retrieved. Allow three enchantments to be retrieved (as enchanted books), but you can't retrieve a curse.
 - When extracting an ingredient from the output slots, the input slot is locked until you have taken all possible ingredients.
 A little cross appears on the input slot when it is locked.
 

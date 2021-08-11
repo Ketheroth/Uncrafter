@@ -66,7 +66,7 @@ public class AdvancedUncrafterContainer extends AbstractContainerMenu implements
 				return !AdvancedUncrafterContainer.this.isInputLocked() && super.mayPickup(playerIn);
 			}
 		});
-
+		//layout enchantments inventory
 		for (int y = 0; y < 3; y++) {
 			for (int x = 0; x < 2; x++) {
 				addSlot(new SlotItemHandler(this.enchantmentHandler, 2 * y + x, 134 + 18 * x, 17 + 18 * y) {
@@ -89,7 +89,7 @@ public class AdvancedUncrafterContainer extends AbstractContainerMenu implements
 		if (player instanceof ServerPlayer) {
 			ItemStack itemstack = this.inputItems.extractItem(0, 64, false);
 			if (!itemstack.isEmpty()) {
-				if (!this.outputItems.isExtracting()) {
+				if (!this.outputItems.isExtracting() && !this.enchantmentHandler.isExtracting()) {
 					if (player.isAlive() && !((ServerPlayer) player).hasDisconnected()) {
 						player.getInventory().placeItemBackInInventory(itemstack);
 					} else {
@@ -126,7 +126,7 @@ public class AdvancedUncrafterContainer extends AbstractContainerMenu implements
 
 	@Override
 	public boolean isInputLocked() {
-		return this.outputItems.isExtracting() || this.enchantmentHandler.isExtracting();
+		return this.outputItems.isExtracting();
 	}
 
 	@Override
