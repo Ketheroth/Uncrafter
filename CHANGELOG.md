@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## Added
+- Allow shift-clicking items in input slot and inventory slots.
+Shift-clicking in output/enchantment slots will be enabled when I find a proper way of doing it.
+
 ### Fixed
 - Unable to get enchanted books after removing every ingredient
 - Enchanted book duplication.

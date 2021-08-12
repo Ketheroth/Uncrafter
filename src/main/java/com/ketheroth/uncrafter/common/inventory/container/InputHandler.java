@@ -25,24 +25,7 @@ public class InputHandler extends ItemStackHandler {
 		for (int i = 0; i < 9; i++) {
 			container.getOutputHandler().setStackInSlot(i, ItemStack.EMPTY);
 		}
-		if (!stack.is(container.getCache().getA())) {
-			Recipe<?> recipe = UncrafterContainer.searchRecipe(stack, container.getRecipeManager());
-			if (recipe != null) {
-				List<ItemStack> list = recipe.getIngredients().stream().collect(ArrayList::new,
-						(accumulator, ingredient) -> accumulator.add(ingredient.isEmpty() ? ItemStack.EMPTY : ingredient.getItems()[0]),
-						ArrayList::addAll);
-				container.getCache().setA(stack.getItem());
-				container.getCache().setB(list);
-			} else {
-				container.getCache().setB(new ArrayList<>());
-			}
-		}
-		//add ingredient items
-		int index = 0;
-		for (ItemStack ingredient : container.getCache().getB()) {
-			container.getOutputHandler().setStackInSlot(index, ingredient.copy());
-			index++;
-		}
+		this.fillOutputSlots(stack);
 		return super.insertItem(slot, stack, simulate);
 	}
 
@@ -58,28 +41,32 @@ public class InputHandler extends ItemStackHandler {
 				container.getOutputHandler().setStackInSlot(i, ItemStack.EMPTY);
 			}
 			if (this.getStackInSlot(slot).getCount() > amount) {
-				ItemStack stack = this.getStackInSlot(0);
-				if (!stack.is(container.getCache().getA())) {
-					Recipe<?> recipe = UncrafterContainer.searchRecipe(stack, container.getRecipeManager());
-					if (recipe != null) {
-						List<ItemStack> list = recipe.getIngredients().stream().collect(ArrayList::new,
-								(accumulator, ingredient) -> accumulator.add(ingredient.isEmpty() ? ItemStack.EMPTY : ingredient.getItems()[new Random().nextInt(ingredient.getItems().length)]),
-								ArrayList::addAll);
-						container.getCache().setA(stack.getItem());
-						container.getCache().setB(list);
-					} else {
-						container.getCache().setB(new ArrayList<>());
-					}
-				}
-				int index = 0;
-				for (ItemStack ingredient : container.getCache().getB()) {
-					container.getOutputHandler().setStackInSlot(index, ingredient.copy());
-					index++;
-				}
+				this.fillOutputSlots(this.getStackInSlot(0));
 			}
 		}
 		return super.extractItem(slot, amount, simulate);
 	}
 
+	public void fillOutputSlots(ItemStack inputStack) {
+		// search ingredient for input item
+		if (!inputStack.is(container.getCache().getA())) {
+			Recipe<?> recipe = UncrafterContainer.searchRecipe(inputStack, container.getRecipeManager());
+			if (recipe != null) {
+				List<ItemStack> list = recipe.getIngredients().stream().collect(ArrayList::new,
+						(accumulator, ingredient) -> accumulator.add(ingredient.isEmpty() ? ItemStack.EMPTY : ingredient.getItems()[new Random().nextInt(ingredient.getItems().length)]),
+						ArrayList::addAll);
+				container.getCache().setA(inputStack.getItem());
+				container.getCache().setB(list);
+			} else {
+				container.getCache().setB(new ArrayList<>());
+			}
+		}
+		// fill output slots with ingredients
+		int index = 0;
+		for (ItemStack ingredient : container.getCache().getB()) {
+			container.getOutputHandler().setStackInSlot(index, ingredient.copy());
+			index++;
+		}
+	}
 }
 
