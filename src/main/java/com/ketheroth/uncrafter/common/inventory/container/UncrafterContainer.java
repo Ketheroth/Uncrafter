@@ -1,6 +1,5 @@
 package com.ketheroth.uncrafter.common.inventory.container;
 
-import com.ketheroth.uncrafter.common.config.Configuration;
 import com.ketheroth.uncrafter.core.registry.UncrafterContainerTypes;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -12,18 +11,14 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
-import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -167,20 +162,6 @@ public class UncrafterContainer extends AbstractContainerMenu implements IUncraf
 	@Override
 	public boolean isAdvanced() {
 		return false;
-	}
-
-	@Nullable
-	public static Recipe<?> searchRecipe(ItemStack input, RecipeManager recipeManager) {
-		Item inputItem = input.getItem();
-		Optional<Recipe<?>> optionalRecipe = recipeManager.getRecipes().stream()
-				.filter(recipe -> recipe.getType().equals(RecipeType.CRAFTING))
-				.filter(recipe -> !Configuration.BLACKLIST.get().contains(recipe.getId().toString()))
-				.filter(recipe -> !Configuration.IMC_BLACKLIST.contains(recipe.getId().toString()))
-				.filter(recipe -> recipe.canCraftInDimensions(3, 3)
-						&& recipe.getResultItem().getItem() == inputItem
-						&& !recipe.getIngredients().isEmpty())
-				.findAny();
-		return optionalRecipe.orElse(null);
 	}
 
 }

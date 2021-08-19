@@ -10,8 +10,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 Shift-clicking in output/enchantment slots will be enabled when I find a proper way of doing it.
 
 ### Fixed
-- Unable to get enchanted books after removing every ingredient
+- Unable to get enchanted books after removing every ingredient.
 - Enchanted book duplication.
+- Ingredients of a shaped recipe have a wrong slot position in the Uncrafter.
 
 ## 1.17.1-0.3.0
 
