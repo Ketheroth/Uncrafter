@@ -1,17 +1,20 @@
 package com.ketheroth.uncrafter.common.inventory.container;
 
 import com.ketheroth.uncrafter.common.config.Configuration;
-import net.minecraft.enchantment.EnchantmentData;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.item.EnchantedBookItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.IRecipeType;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.item.crafting.RecipeManager;
+import net.minecraftforge.common.crafting.IShapedRecipe;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 public class InputHandler extends ItemStackHandler {
@@ -30,42 +33,7 @@ public class InputHandler extends ItemStackHandler {
 		for (int i = 0; i < 9; i++) {
 			container.getOutputHandler().setStackInSlot(i, ItemStack.EMPTY);
 		}
-		if (container.isAdvanced() && container.getEnchantmentHandler() != null) {
-			for (int i = 0; i < 6; i++) {
-				container.getEnchantmentHandler().setStackInSlot(i, ItemStack.EMPTY);
-			}
-			container.getEnchantmentHandler().resetExtracting();
-		}
-		if (!stack.sameItem(container.getCache().getA())) {
-			IRecipe<?> recipe = UncrafterContainer.searchRecipe(stack, container.getRecipeManager());
-			if (recipe != null) {
-				List<ItemStack> list = recipe.getIngredients().stream().collect(ArrayList::new,
-						(accumulator, ingredient) -> accumulator.add(ingredient.isEmpty() ? ItemStack.EMPTY : ingredient.getItems()[0]),
-						ArrayList::addAll);
-				container.setCache(stack, list);
-			} else {
-				container.setCache(new ArrayList<>());
-			}
-		}
-		//add ingredient items
-		int index = 0;
-		for (ItemStack ingredient : container.getCache().getB()) {
-			container.getOutputHandler().setStackInSlot(index, ingredient.copy());
-			index++;
-		}
-		//add enchantments
-		if (container.isAdvanced() && container.getEnchantmentHandler() != null && stack.isEnchanted()) {
-			ArrayList<ItemStack> books = new ArrayList<>();
-			EnchantmentHelper.getEnchantments(stack).forEach((enchantment, level) -> {
-				if (!enchantment.isCurse()) {
-					books.add(EnchantedBookItem.createForEnchantment(new EnchantmentData(enchantment, Configuration.MINIMUM_LEVEL_FOR_ENCHANTMENTS.get() ? 1 : level)));
-				}
-			});
-			Collections.shuffle(books);
-			for (int i = 0; i < 6 && i < books.size(); i++) {
-				container.getEnchantmentHandler().setStackInSlot(i, books.get(i));
-			}
-		}
+		this.fillOutputSlots(stack);
 		return super.insertItem(slot, stack, simulate);
 	}
 
@@ -80,41 +48,86 @@ public class InputHandler extends ItemStackHandler {
 			for (int i = 0; i < 9; i++) {
 				container.getOutputHandler().setStackInSlot(i, ItemStack.EMPTY);
 			}
-			if (container.isAdvanced() && container.getEnchantmentHandler() != null) {
-				for (int i = 0; i < 6; i++) {
-					container.getEnchantmentHandler().setStackInSlot(i, ItemStack.EMPTY);
-				}
-				container.getEnchantmentHandler().resetExtracting();
-			}
 			if (this.getStackInSlot(slot).getCount() > amount) {
-				ItemStack stack = this.getStackInSlot(0);
-				if (!stack.sameItem(container.getCache().getA())) {
-					IRecipe<?> recipe = UncrafterContainer.searchRecipe(stack, container.getRecipeManager());
-					if (recipe != null) {
-						List<ItemStack> list = recipe.getIngredients().stream().collect(ArrayList::new,
-								(accumulator, ingredient) -> accumulator.add(ingredient.isEmpty() ? ItemStack.EMPTY : ingredient.getItems()[new Random().nextInt(ingredient.getItems().length)]),
-								ArrayList::addAll);
-						container.setCache(stack, list);
-					} else {
-						container.setCache(new ArrayList<>());
-					}
-				}
-				int index = 0;
-				for (ItemStack ingredient : container.getCache().getB()) {
-					container.getOutputHandler().setStackInSlot(index, ingredient.copy());
-					index++;
-				}
-				if (container.isAdvanced() && container.getEnchantmentHandler() != null && stack.isEnchanted()) {
-					ArrayList<ItemStack> books = new ArrayList<>();
-					EnchantmentHelper.getEnchantments(stack).forEach((enchantment, level) -> books.add(EnchantedBookItem.createForEnchantment(new EnchantmentData(enchantment, Configuration.MINIMUM_LEVEL_FOR_ENCHANTMENTS.get() ? 1 : level))));
-					Collections.shuffle(books);
-					for (int i = 0; i < 6 && i < books.size(); i++) {
-						container.getEnchantmentHandler().setStackInSlot(i, books.get(i));
-					}
-				}
+				this.fillOutputSlots(this.getStackInSlot(0));
 			}
 		}
 		return super.extractItem(slot, amount, simulate);
+	}
+
+	public void fillOutputSlots(ItemStack inputStack) {
+		// search ingredient for input item
+		if (!inputStack.sameItem(container.getCache().getA())) {
+			IRecipe<?> recipe = searchRecipe(inputStack, container.getRecipeManager());
+			if (recipe != null) {
+				List<ItemStack> list = convertTo3x3(recipe).stream().collect(ArrayList::new,
+						(accumulator, ingredient) -> accumulator.add(ingredient.isEmpty() ? ItemStack.EMPTY : ingredient.getItems()[new Random().nextInt(ingredient.getItems().length)]),
+						ArrayList::addAll);
+				container.setCache(inputStack, list);
+			} else {
+				container.setCache(new ArrayList<>());
+			}
+		}
+		// fill output slots with ingredients
+		int index = 0;
+		for (ItemStack ingredient : container.getCache().getB()) {
+			container.getOutputHandler().setStackInSlot(index, ingredient.copy());
+			index++;
+		}
+	}
+
+	/**
+	 * Convert a random sized recipe to a 3x3 recipe.
+	 *
+	 * @param recipe the recipe to convert.
+	 * @return the ordered list of ingredients.
+	 */
+	public static List<Ingredient> convertTo3x3(IRecipe<?> recipe) {
+		List<Ingredient> ingredients = new ArrayList<>(recipe.getIngredients());
+		if (recipe instanceof IShapedRecipe) {
+			int width = ((IShapedRecipe<?>) recipe).getRecipeWidth();
+			if (width == 2) {
+				ingredients.add(Ingredient.EMPTY);
+				ingredients.add(Ingredient.EMPTY);
+				ingredients.add(Ingredient.EMPTY);
+				ingredients.add(4, Ingredient.EMPTY);
+				ingredients.add(2, Ingredient.EMPTY);
+			} else if (width == 1) {
+				ingredients.add(Ingredient.EMPTY);
+				ingredients.add(Ingredient.EMPTY);
+				ingredients.add(2, Ingredient.EMPTY);
+				ingredients.add(2, Ingredient.EMPTY);
+				ingredients.add(1, Ingredient.EMPTY);
+				ingredients.add(1, Ingredient.EMPTY);
+				ingredients.add(0, Ingredient.EMPTY);
+
+			}
+		}
+		while (ingredients.size() > 9) {
+			ingredients.remove(ingredients.size() - 1);
+		}
+		return ingredients;
+	}
+
+	/**
+	 * Search a recipe having its result item being {@code input}.
+	 *
+	 * @param input         the result item of the recipe.
+	 * @param recipeManager the recipe manager in which the recipe should be searched.
+	 * @return the found recipe, or null if the recipe was not found.
+	 */
+	@Nullable
+	public static IRecipe<?> searchRecipe(ItemStack input, RecipeManager recipeManager) {
+		Item inputItem = input.getItem();
+		Optional<IRecipe<?>> optionalRecipe = recipeManager.getRecipes().stream()
+				.filter(recipe -> recipe.getType().equals(IRecipeType.CRAFTING))
+				.filter(recipe -> !Configuration.BLACKLIST.get().contains(recipe.getId().toString()))
+				.filter(recipe -> !Configuration.IMC_BLACKLIST.contains(recipe.getId().toString()))
+				.filter(recipe -> recipe.canCraftInDimensions(3, 3)
+						&& recipe.getResultItem().getItem() == inputItem
+						&& !recipe.getIngredients().isEmpty())
+				.findAny();
+		return optionalRecipe.orElse(null);
 	}
 
 }

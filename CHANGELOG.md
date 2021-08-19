@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.16.5-0.4.0
+
+## Added
+- Allow shift-clicking items in input slot and inventory slots.
+  Shift-clicking in output/enchantment slots will be enabled when I find a proper way of doing it.
+
+### Fixed
+- Unable to get enchanted books after removing every ingredient.
+- Enchanted book duplication.
+- Ingredients of a shaped recipe have a wrong slot position in the Uncrafter.
+
 ## 1.16.5-0.3.0
 
 ### Added

@@ -6,6 +6,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.RecipeManager;
 import net.minecraft.util.Tuple;
@@ -39,15 +40,14 @@ public class AdvancedUncrafterContainer extends Container implements IUncrafterC
 		this.outputItems = new OutputHandler(9, this);
 		this.inputItems = new InputHandler(1, this);
 		this.enchantmentHandler = new EnchantmentHandler(6);
-		//layout player inventory
-		for (int y = 0; y < 3; y++) {
-			for (int x = 0; x < 9; x++) {
-				addSlot(new SlotItemHandler(this.playerInventory, 9 + 9 * y + x, 8 + 18 * x, 84 + 18 * y));
+
+		//layout input inventory
+		addSlot(new SlotItemHandler(this.inputItems, 0, 12, 35) {
+			@Override
+			public boolean mayPickup(PlayerEntity playerIn) {
+				return !AdvancedUncrafterContainer.this.isInputLocked() && super.mayPickup(playerIn);
 			}
-		}
-		for (int i = 0; i < 9; i++) {
-			addSlot(new SlotItemHandler(this.playerInventory, i, 8 + 18 * i, 142));
-		}
+		});
 		//layout output inventory
 		for (int y = 0; y < 3; y++) {
 			for (int x = 0; x < 3; x++) {
@@ -59,14 +59,7 @@ public class AdvancedUncrafterContainer extends Container implements IUncrafterC
 				});
 			}
 		}
-		//layout input inventory
-		addSlot(new SlotItemHandler(this.inputItems, 0, 12, 35) {
-			@Override
-			public boolean mayPickup(PlayerEntity playerIn) {
-				return !AdvancedUncrafterContainer.this.isInputLocked() && super.mayPickup(playerIn);
-			}
-		});
-
+		//layout enchantments inventory
 		for (int y = 0; y < 3; y++) {
 			for (int x = 0; x < 2; x++) {
 				addSlot(new SlotItemHandler(this.enchantmentHandler, 2 * y + x, 134 + 18 * x, 17 + 18 * y) {
@@ -76,6 +69,15 @@ public class AdvancedUncrafterContainer extends Container implements IUncrafterC
 					}
 				});
 			}
+		}
+		//layout player inventory
+		for (int y = 0; y < 3; y++) {
+			for (int x = 0; x < 9; x++) {
+				addSlot(new SlotItemHandler(this.playerInventory, 9 + 9 * y + x, 8 + 18 * x, 84 + 18 * y));
+			}
+		}
+		for (int i = 0; i < 9; i++) {
+			addSlot(new SlotItemHandler(this.playerInventory, i, 8 + 18 * i, 142));
 		}
 	}
 
@@ -102,26 +104,44 @@ public class AdvancedUncrafterContainer extends Container implements IUncrafterC
 
 	@Override
 	public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
-		return ItemStack.EMPTY;
-//		ItemStack itemstack = ItemStack.EMPTY;
-//		Slot slot = this.slots.get(index);
-//		if (slot != null && slot.hasItem()) {
-//			ItemStack itemstack1 = slot.getItem();
-//			itemstack = itemstack1.copy();
-//			if (index < playerInventory.getSlots()) {
-//				if (!this.moveItemStackTo(itemstack1, playerInventory.getSlots(), this.slots.size(), true)) {
-//					return ItemStack.EMPTY;
-//				}
-//			} else if (!this.moveItemStackTo(itemstack1, 0, playerInventory.getSlots(), false)) {
-//				return ItemStack.EMPTY;
-//			}
-//			if (itemstack1.isEmpty()) {
-//				slot.set(ItemStack.EMPTY);
-//			} else {
-//				slot.setChanged();
-//			}
-//		}
-//		return itemstack;
+		ItemStack itemstack = ItemStack.EMPTY;
+		Slot slot = this.slots.get(index);
+		if (slot != null && slot.hasItem()) {
+			ItemStack slotStack = slot.getItem();
+			itemstack = slotStack.copy();
+			if (index == 0) {// shift-click in input slot
+				if (!this.moveItemStackTo(slotStack, 16, 52, true)) {
+					return ItemStack.EMPTY;
+				}
+				if (slotStack.isEmpty()) {
+					for (int i = 0; i < 9; i++) {
+						this.outputItems.setStackInSlot(i, ItemStack.EMPTY);
+					}
+				}
+			} else if (1 <= index && index < 10) {// shift-click in output slots
+				// nothing happens
+			} else if (10 <= index && index < 16) {// shift-click in enchantment slots
+				// nothing happens
+			} else if (index < 52) {// shift-click in inventory slots
+				if (!slots.get(0).hasItem() || slotStack.sameItem(slots.get(0).getItem())) {//shift click from inventory
+					if (!this.moveItemStackTo(slotStack, 0, 1, false)) {
+						return ItemStack.EMPTY;
+					}
+					inputItems.fillOutputSlots(itemstack);
+				}
+			}
+
+			if (slotStack.isEmpty()) {
+				slot.set(ItemStack.EMPTY);
+			} else {
+				slot.setChanged();
+			}
+			if (slotStack.getCount() == itemstack.getCount()) {
+				return ItemStack.EMPTY;
+			}
+			slot.onTake(playerIn, slotStack);
+		}
+		return itemstack;
 	}
 
 	@Override
@@ -150,13 +170,13 @@ public class AdvancedUncrafterContainer extends Container implements IUncrafterC
 	}
 
 	@Override
-	public void setCache(ItemStack a, List<ItemStack> b) {
-		this.cache = new Tuple<>(a, b);
+	public void setCache(List<ItemStack> b) {
+		this.cache = new Tuple<>(cache.getA(), b);
 	}
 
 	@Override
-	public void setCache(List<ItemStack> b) {
-		this.cache = new Tuple<>(cache.getA(), b);
+	public void setCache(ItemStack a, List<ItemStack> b) {
+		this.cache = new Tuple<>(a, b);
 	}
 
 	@Override
