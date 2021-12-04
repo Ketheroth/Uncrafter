@@ -4,7 +4,7 @@
 
 Uncrafter is a Minecraft Forge mod adding a block capable of uncrafting items.
 
-Version : 1.17
+Version : 1.18
 
 ---
 
