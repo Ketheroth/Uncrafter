@@ -3,9 +3,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.16.5-1.0.0
+
+### Added
+- Whitelist of items in the uncrafter (if the list contains value the blacklist isn't used).
+
+### Changed
+- Blacklist now uses items instead of recipes (whitelist uses items too)
+- InterModCommunication now uses items instead of recipes
+
+### Fixed
+- Uncrafting items with tags as ingredient give random items
+
 ## 1.16.5-0.4.0
 
-## Added
+### Added
 - Allow shift-clicking items in input slot and inventory slots.
   Shift-clicking in output/enchantment slots will be enabled when I find a proper way of doing it.
 

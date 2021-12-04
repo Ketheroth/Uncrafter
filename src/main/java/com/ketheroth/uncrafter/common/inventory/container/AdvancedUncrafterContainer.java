@@ -1,5 +1,6 @@
 package com.ketheroth.uncrafter.common.inventory.container;
 
+import com.ketheroth.uncrafter.common.config.Configuration;
 import com.ketheroth.uncrafter.core.registry.UncrafterContainerTypes;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.player.PlayerEntity;
@@ -43,6 +44,18 @@ public class AdvancedUncrafterContainer extends Container implements IUncrafterC
 
 		//layout input inventory
 		addSlot(new SlotItemHandler(this.inputItems, 0, 12, 35) {
+			@Override
+			public boolean mayPlace(@Nonnull ItemStack stack) {
+				if (stack.getItem().getRegistryName() == null) {
+					return false;
+				}
+				String name = stack.getItem().getRegistryName().toString();
+				if (Configuration.WHITELIST.get().isEmpty()) {
+					return !Configuration.BLACKLIST.get().contains(name) && !Configuration.IMC_BLACKLIST.contains(name);
+				}
+				return Configuration.WHITELIST.get().contains(name);
+			}
+
 			@Override
 			public boolean mayPickup(PlayerEntity playerIn) {
 				return !AdvancedUncrafterContainer.this.isInputLocked() && super.mayPickup(playerIn);
@@ -142,6 +155,11 @@ public class AdvancedUncrafterContainer extends Container implements IUncrafterC
 			slot.onTake(playerIn, slotStack);
 		}
 		return itemstack;
+	}
+
+	@Override
+	public boolean canTakeItemForPickAll(ItemStack pStack, Slot pSlot) {
+		return false;
 	}
 
 	@Override

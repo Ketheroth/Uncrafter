@@ -61,7 +61,7 @@ public class InputHandler extends ItemStackHandler {
 			IRecipe<?> recipe = searchRecipe(inputStack, container.getRecipeManager());
 			if (recipe != null) {
 				List<ItemStack> list = convertTo3x3(recipe).stream().collect(ArrayList::new,
-						(accumulator, ingredient) -> accumulator.add(ingredient.isEmpty() ? ItemStack.EMPTY : ingredient.getItems()[new Random().nextInt(ingredient.getItems().length)]),
+						(accumulator, ingredient) -> accumulator.add(ingredient.isEmpty() ? ItemStack.EMPTY : ingredient.getItems()[0]),
 						ArrayList::addAll);
 				container.setCache(inputStack, list);
 			} else {
@@ -100,7 +100,6 @@ public class InputHandler extends ItemStackHandler {
 				ingredients.add(1, Ingredient.EMPTY);
 				ingredients.add(1, Ingredient.EMPTY);
 				ingredients.add(0, Ingredient.EMPTY);
-
 			}
 		}
 		while (ingredients.size() > 9) {
@@ -121,7 +120,7 @@ public class InputHandler extends ItemStackHandler {
 		Item inputItem = input.getItem();
 		Optional<IRecipe<?>> optionalRecipe = recipeManager.getRecipes().stream()
 				.filter(recipe -> recipe.getType().equals(IRecipeType.CRAFTING))
-				.filter(recipe -> !Configuration.BLACKLIST.get().contains(recipe.getId().toString()))
+//				.filter(recipe -> !Configuration.BLACKLIST.get().contains(recipe.getId().toString()))
 				.filter(recipe -> !Configuration.IMC_BLACKLIST.contains(recipe.getId().toString()))
 				.filter(recipe -> recipe.canCraftInDimensions(3, 3)
 						&& recipe.getResultItem().getItem() == inputItem

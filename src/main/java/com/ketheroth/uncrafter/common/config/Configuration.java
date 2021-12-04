@@ -3,6 +3,7 @@ package com.ketheroth.uncrafter.common.config;
 import com.google.common.collect.Lists;
 import net.minecraftforge.common.ForgeConfigSpec;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Configuration {
@@ -10,22 +11,23 @@ public class Configuration {
 	public static ForgeConfigSpec CONFIG;
 
 	public static ForgeConfigSpec.ConfigValue<List<String>> BLACKLIST;
+	public static ForgeConfigSpec.ConfigValue<List<String>> WHITELIST;
 	public static ForgeConfigSpec.ConfigValue<Integer> EXTRACT_AMOUNT;
 	public static final ForgeConfigSpec.ConfigValue<Integer> ADVANCED_EXTRACT_AMOUNT;
 	public static final ForgeConfigSpec.ConfigValue<Integer> ENCHANTMENT_EXTRACT_AMOUNT;
 	public static final ForgeConfigSpec.ConfigValue<Boolean> MINIMUM_LEVEL_FOR_ENCHANTMENTS;
 
-	public static List<String> IMC_BLACKLIST = Lists.newArrayList();
+	public static List<String> IMC_BLACKLIST = new ArrayList<>();
 
 	static {
 		ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
-		BLACKLIST = BUILDER.comment("Blacklisted crafting recipe. Recipes in the list won't be allowed to be reversed in the uncrafter.")
+		BLACKLIST = BUILDER.comment("Blacklisted items. Items in this list won't be able to be used in the uncrafter. This list is used only if the whitelist is empty.")
 				.define("blacklist", Lists.newArrayList(
 						"minecraft:coal", "minecraft:diamond", "minecraft:emerald",
-						"minecraft:gold_ingot_from_gold_block", "minecraft:gold_nugget",
-						"minecraft:iron_ingot_from_iron_block", "minecraft:iron_nugget", "minecraft:lapis_lazuli",
-						"minecraft:netherite_ingot_from_netherite_block", "minecraft:redstone",
+						"minecraft:gold_ingot", "minecraft:gold_nugget",
+						"minecraft:iron_ingot", "minecraft:iron_nugget", "minecraft:lapis_lazuli",
+						"minecraft:netherite_ingot", "minecraft:redstone",
 						"minecraft:acacia_planks", "minecraft:birch_planks", "minecraft:crimson_planks",
 						"minecraft:dark_oak_planks", "minecraft:jungle_planks", "minecraft:oak_planks",
 						"minecraft:spruce_planks", "minecraft:warped_planks", "minecraft:acacia_plank",
@@ -33,8 +35,8 @@ public class Configuration {
 						"minecraft:jungle_plank", "minecraft:oak_plank", "minecraft:spruce_plank",
 						"minecraft:warped_plank", "minecraft:blaze_powder", "minecraft:slime_ball",
 						"minecraft:soul_torch", "minecraft:stick", "minecraft:torch", "minecraft:wheat",
-						"minecraft:magenta_dye_from_lilac", "minecraft:pink_dye_from_peony",
-						"minecraft:red_dye_from_rose_bush", "minecraft:yellow_dye_from_sunflower",
+						"minecraft:magenta_dye", "minecraft:pink_dye",
+						"minecraft:red_dye", "minecraft:yellow_dye",
 						"minecraft:black_stained_glass_pane", "minecraft:blue_stained_glass_pane",
 						"minecraft:brown_stained_glass_pane", "minecraft:cyan_stained_glass_pane",
 						"minecraft:gray_stained_glass_pane", "minecraft:light_blue_stained_glass_pane",
@@ -54,6 +56,9 @@ public class Configuration {
 						"minecraft:smooth_quart_slab", "minecraft:smooth_red_sandstone_slab",
 						"minecraft:smooth_stone_slab", "minecraft:stone_slab"
 				));
+
+		WHITELIST = BUILDER.comment("Whitelisted items. Only these items are allowed to be used in the uncrafter. The blacklist will have no effect if the whitelist isn't empty.")
+				.define("whitelist", new ArrayList<>());
 
 		EXTRACT_AMOUNT = BUILDER.comment("Amount of ingredients that can be retrieved in the uncrafter (default=1)")
 				.define("extractAmount", 1);

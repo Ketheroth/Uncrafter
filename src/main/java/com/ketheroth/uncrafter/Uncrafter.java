@@ -46,10 +46,10 @@ public class Uncrafter {
 	}
 
 	private void processIMC(final InterModProcessEvent event) {
-		event.getIMCStream().filter(message -> message.getMethod().equals("blacklistedRecipes")).forEach(message -> {
+		event.getIMCStream().filter(message -> message.getMethod().equals("blacklisted-items")).forEach(message -> {
 			try {
-				List<?> recipes = (List<?>) message.getMessageSupplier().get();
-				recipes.stream().map(String.class::cast).forEach(recipe -> Configuration.IMC_BLACKLIST.add(recipe));
+				List<?> items = (List<?>) message.getMessageSupplier().get();
+				items.stream().map(String.class::cast).forEach(recipe -> Configuration.IMC_BLACKLIST.add(recipe));
 			} catch (ClassCastException e) {
 				LOGGER.error("Error receiving IMC from : " + message.getModId());
 			}
