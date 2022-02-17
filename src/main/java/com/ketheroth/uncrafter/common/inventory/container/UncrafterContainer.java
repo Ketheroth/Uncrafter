@@ -1,5 +1,6 @@
 package com.ketheroth.uncrafter.common.inventory.container;
 
+import com.ketheroth.uncrafter.common.config.Configuration;
 import com.ketheroth.uncrafter.core.registry.UncrafterContainerTypes;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -15,6 +16,7 @@ import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -42,8 +44,20 @@ public class UncrafterContainer extends AbstractContainerMenu implements IUncraf
 		//layout input inventory
 		this.addSlot(new SlotItemHandler(this.inputItems, 0, 35, 35) {
 			@Override
+			public boolean mayPlace(@NotNull ItemStack stack) {
+				if (stack.getItem().getRegistryName() == null) {
+					return false;
+				}
+				String name = stack.getItem().getRegistryName().toString();
+				if (Configuration.WHITELIST.get().isEmpty()) {
+					return !Configuration.BLACKLIST.get().contains(name) && !Configuration.IMC_BLACKLIST.contains(name);
+				}
+				return Configuration.WHITELIST.get().contains(name);
+			}
+
+			@Override
 			public boolean mayPickup(Player playerIn) {
-				return !UncrafterContainer.this.outputItems.isExtracting() && super.mayPickup(playerIn);
+				return !UncrafterContainer.this.isInputLocked() && super.mayPickup(playerIn);
 			}
 		});
 		//layout output inventory
@@ -127,6 +141,11 @@ public class UncrafterContainer extends AbstractContainerMenu implements IUncraf
 			slot.onTake(playerIn, slotStack);
 		}
 		return itemstack;
+	}
+
+	@Override
+	public boolean canTakeItemForPickAll(ItemStack stack, Slot slot) {
+		return false;
 	}
 
 	@Override

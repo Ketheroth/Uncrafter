@@ -2,7 +2,7 @@
 
 ---
 
-Uncrafter is a Minecraft Forge mod adding a block capable of uncrafting items.
+Uncrafter is a Minecraft Forge mod adding blocks capable of uncrafting items.
 
 Version : 1.18
 
@@ -14,11 +14,11 @@ CurseForge : [Project Link](https://www.curseforge.com/minecraft/mc-mods/uncraft
 
 ## For mod developers
 
-You can send IMC messages to this mod to disable recipes in the uncrafter (meaning the recipe can't be inverted).  
+You can send IMC messages to this mod to disable items in the uncrafter (meaning this item can't be uncrafted).  
 
-The method the mod is awaiting is `blacklistedRecipes`, and the supplier should return a list of strings (a string being a recipe id).
+The method the mod is awaiting is `blacklisted-items`, and the supplier should return a list of strings (a string being an item id).
 
 Example :
 ```java
-InterModComms.sendTo("uncrafter", "blacklistedRecipes", () -> List.of("modid:recipe_for_something"));
+InterModComms.sendTo("uncrafter", "blacklisted-items", () -> List.of("modid:item"));
 ```
