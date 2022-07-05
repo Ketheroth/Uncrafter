@@ -1,7 +1,9 @@
 package com.ketheroth.uncrafter.common.config;
 
 import com.google.common.collect.Lists;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +32,9 @@ public class Configuration {
 						"minecraft:raw_copper", "minecraft:raw_gold", "minecraft:raw_iron", "minecraft:acacia_planks",
 						"minecraft:birch_planks", "minecraft:crimson_planks", "minecraft:dark_oak_planks",
 						"minecraft:jungle_planks", "minecraft:oak_planks", "minecraft:spruce_planks",
-						"minecraft:warped_planks", "minecraft:acacia_plank", "minecraft:birch_plank",
-						"minecraft:crimson_plank", "minecraft:dark_oak_plank", "minecraft:jungle_plank",
-						"minecraft:oak_plank", "minecraft:spruce_plank", "minecraft:warped_plank",
+						"minecraft:warped_planks", "minecraft:acacia_planks", "minecraft:birch_planks",
+						"minecraft:crimson_planks", "minecraft:dark_oak_plank", "minecraft:jungle_planks",
+						"minecraft:oak_planks", "minecraft:spruce_planks", "minecraft:warped_planks",
 						"minecraft:blaze_powder", "minecraft:slime_ball", "minecraft:soul_torch", "minecraft:stick",
 						"minecraft:torch", "minecraft:wheat", "minecraft:magenta_dye", "minecraft:pink_dye",
 						"minecraft:red_dye", "minecraft:yellow_dye", "minecraft:black_stained_glass_pane",
@@ -75,6 +77,17 @@ public class Configuration {
 				.define("minimumLevelForEnchantments", false);
 
 		CONFIG = BUILDER.build();
+	}
+
+	public static boolean isValidItem(Item item) {
+		if (ForgeRegistries.ITEMS.getKey(item) == null) {
+			return false;
+		}
+		String name = ForgeRegistries.ITEMS.getKey(item).toString();
+		if (Configuration.WHITELIST.get().isEmpty()) {
+			return !Configuration.BLACKLIST.get().contains(name) && !Configuration.IMC_BLACKLIST.contains(name);
+		}
+		return Configuration.WHITELIST.get().contains(name);
 	}
 
 }

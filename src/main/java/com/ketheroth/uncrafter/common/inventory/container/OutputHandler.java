@@ -1,5 +1,6 @@
 package com.ketheroth.uncrafter.common.inventory.container;
 
+import com.ketheroth.uncrafter.common.blockentity.UncrafterBlockEntity;
 import com.ketheroth.uncrafter.common.config.Configuration;
 import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
@@ -13,13 +14,13 @@ import java.util.Collections;
 
 public class OutputHandler extends ItemStackHandler {
 
-	private final IUncrafterContainer container;
+	private final UncrafterBlockEntity uncrafterBlockEntity;
 	private int extracted;
 
-	public OutputHandler(int size, IUncrafterContainer container) {
+	public OutputHandler(int size, UncrafterBlockEntity uncrafterBlockEntity) {
 		super(size);
 		extracted = 0;
-		this.container = container;
+		this.uncrafterBlockEntity = uncrafterBlockEntity;
 	}
 
 	@Nonnull
@@ -31,29 +32,29 @@ public class OutputHandler extends ItemStackHandler {
 			extracted++;
 		}
 		//then we remove one item from the input stack
-		if (extracted >= (container.isAdvanced() ? Configuration.ADVANCED_EXTRACT_AMOUNT.get() : Configuration.EXTRACT_AMOUNT.get()) || this.isEmpty()) {
-			container.getInputHandler().extractItem(0, amount, simulate);
+		if (extracted >= (uncrafterBlockEntity.isAdvanced() ? Configuration.ADVANCED_EXTRACT_AMOUNT.get() : Configuration.EXTRACT_AMOUNT.get()) || this.isEmpty()) {
+			uncrafterBlockEntity.getInput().extractItem(0, amount, simulate);
 			if (!simulate) {
 				extracted = 0;
 			}
 		}
 		if (extracted == 1 && !simulate) {
-			if (container.isAdvanced() && container.getEnchantmentHandler() != null && container.getInputHandler().getStackInSlot(0).isEnchanted()) {
+			if (uncrafterBlockEntity.isAdvanced() && uncrafterBlockEntity.getEnchantmentOutput() != null && uncrafterBlockEntity.getInput().getStackInSlot(0).isEnchanted()) {
 				//clear enchantment slots
 				for (int i = 0; i < 6; i++) {
-					container.getEnchantmentHandler().setStackInSlot(i, ItemStack.EMPTY);
+					uncrafterBlockEntity.getEnchantmentOutput().setStackInSlot(i, ItemStack.EMPTY);
 				}
-				container.getEnchantmentHandler().resetExtracting();
+				uncrafterBlockEntity.getEnchantmentOutput().resetExtracting();
 				//fill enchantments slots
 				ArrayList<ItemStack> books = new ArrayList<>();
-				EnchantmentHelper.getEnchantments(container.getInputHandler().getStackInSlot(0)).forEach((enchantment, level) -> {
+				EnchantmentHelper.getEnchantments(uncrafterBlockEntity.getInput().getStackInSlot(0)).forEach((enchantment, level) -> {
 					if (!enchantment.isCurse()) {
 						books.add(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchantment, Configuration.MINIMUM_LEVEL_FOR_ENCHANTMENTS.get() ? 1 : level)));
 					}
 				});
 				Collections.shuffle(books);
 				for (int i = 0; i < 6 && i < books.size(); i++) {
-					container.getEnchantmentHandler().setStackInSlot(i, books.get(i));
+					uncrafterBlockEntity.getEnchantmentOutput().setStackInSlot(i, books.get(i));
 				}
 			}
 		}

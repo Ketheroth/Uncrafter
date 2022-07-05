@@ -1,6 +1,8 @@
 package com.ketheroth.uncrafter.common.bock;
 
+import com.ketheroth.uncrafter.common.blockentity.UncrafterBlockEntity;
 import com.ketheroth.uncrafter.common.inventory.container.UncrafterContainer;
+import com.ketheroth.uncrafter.core.registry.UncrafterBlockEntities;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -14,16 +16,21 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.network.NetworkHooks;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @SuppressWarnings("deprecation")
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class UncrafterBlock extends Block {
+public class UncrafterBlock extends Block implements EntityBlock {
 
 	public UncrafterBlock(Properties properties) {
 		super(properties);
@@ -49,6 +56,18 @@ public class UncrafterBlock extends Block {
 
 		NetworkHooks.openGui((ServerPlayer) player, provider, buf -> buf.writeBlockPos(pos));
 		return InteractionResult.SUCCESS;
+	}
+
+	@Nullable
+	@Override
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+		return new UncrafterBlockEntity(pos, state);
+	}
+
+	@Nullable
+	@Override
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+		return blockEntityType == UncrafterBlockEntities.UNCRAFTER.get() ? (level1, pos, state1, be) -> ((UncrafterBlockEntity) be).tick(level1, pos, state1, (UncrafterBlockEntity) be) : null;
 	}
 
 }

@@ -3,6 +3,7 @@ package com.ketheroth.uncrafter;
 import com.ketheroth.uncrafter.client.gui.screen.inventory.AdvancedUncrafterScreen;
 import com.ketheroth.uncrafter.client.gui.screen.inventory.UncrafterScreen;
 import com.ketheroth.uncrafter.common.config.Configuration;
+import com.ketheroth.uncrafter.core.registry.UncrafterBlockEntities;
 import com.ketheroth.uncrafter.core.registry.UncrafterBlocks;
 import com.ketheroth.uncrafter.core.registry.UncrafterContainerTypes;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -35,6 +36,7 @@ public class Uncrafter {
 
 		UncrafterBlocks.BLOCKS.register(modEventBus);
 		UncrafterBlocks.ITEMS.register(modEventBus);
+		UncrafterBlockEntities.BLOCK_ENTITIES.register(modEventBus);
 		UncrafterContainerTypes.CONTAINERS.register(modEventBus);
 
 		MinecraftForge.EVENT_BUS.register(this);
