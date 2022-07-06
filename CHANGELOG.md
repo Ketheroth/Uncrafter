@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.19-1.1.1
+
+### Fixed
+- uncrafter block-entity not loading correctly
+
 ## 1.19-1.1.0
 
 ### Added

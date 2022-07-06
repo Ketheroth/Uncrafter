@@ -9,8 +9,6 @@ import com.ketheroth.uncrafter.core.registry.UncrafterBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -28,10 +26,8 @@ import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class UncrafterBlockEntity extends BlockEntity {
 
@@ -61,7 +57,6 @@ public class UncrafterBlockEntity extends BlockEntity {
 		if (this.cooldown > 0) {
 			return;
 		}
-//		cooldown = 8;
 		// import input items from container above
 		importItem(level, this.worldPosition.above(), Direction.DOWN);
 
@@ -218,10 +213,10 @@ public class UncrafterBlockEntity extends BlockEntity {
 	@Override
 	public void load(CompoundTag tag) {
 		super.load(tag);
-		this.input.deserializeNBT(tag);
-		this.output.deserializeNBT(tag);
+		this.input.deserializeNBT(tag.getCompound("input"));
+		this.output.deserializeNBT(tag.getCompound("output"));
 		if (this.isAdvanced) {
-			this.enchantmentOutput.deserializeNBT(tag);
+			this.enchantmentOutput.deserializeNBT(tag.getCompound("enchantmentOutput"));
 		}
 		int[] selected = tag.getIntArray("selected");
 		for (int value : selected) {
