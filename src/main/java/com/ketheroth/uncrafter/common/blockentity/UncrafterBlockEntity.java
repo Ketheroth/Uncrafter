@@ -57,7 +57,6 @@ public class UncrafterBlockEntity extends BlockEntity {
 		if (this.cooldown > 0) {
 			return;
 		}
-//		cooldown = 8;
 		// import input items from container above
 		importItem(level, this.worldPosition.above(), Direction.DOWN);
 
@@ -214,10 +213,10 @@ public class UncrafterBlockEntity extends BlockEntity {
 	@Override
 	public void load(CompoundTag tag) {
 		super.load(tag);
-		this.input.deserializeNBT(tag);
-		this.output.deserializeNBT(tag);
+		this.input.deserializeNBT(tag.getCompound("input"));
+		this.output.deserializeNBT(tag.getCompound("output"));
 		if (this.isAdvanced) {
-			this.enchantmentOutput.deserializeNBT(tag);
+			this.enchantmentOutput.deserializeNBT(tag.getCompound("enchantmentOutput"));
 		}
 		int[] selected = tag.getIntArray("selected");
 		for (int value : selected) {
