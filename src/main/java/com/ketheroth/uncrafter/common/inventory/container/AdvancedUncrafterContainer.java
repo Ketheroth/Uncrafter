@@ -1,11 +1,13 @@
 package com.ketheroth.uncrafter.common.inventory.container;
 
 import com.ketheroth.uncrafter.common.config.Configuration;
+import com.ketheroth.uncrafter.common.tileentity.UncrafterTileEntity;
 import com.ketheroth.uncrafter.core.registry.UncrafterContainerTypes;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.ClickType;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
@@ -23,10 +25,11 @@ import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AdvancedUncrafterContainer extends Container implements IUncrafterContainer {
+public class AdvancedUncrafterContainer extends Container {
 
 	private final BlockPos pos;
 	private final PlayerEntity player;
+	private final UncrafterTileEntity uncrafter;
 	private final IItemHandler playerInventory;
 	private final OutputHandler outputItems;
 	private final InputHandler inputItems;
@@ -37,28 +40,22 @@ public class AdvancedUncrafterContainer extends Container implements IUncrafterC
 		super(UncrafterContainerTypes.ADVANCED_UNCRAFTER_CONTAINER.get(), windowId);
 		this.pos = pos;
 		this.player = player;
+		this.uncrafter = ((UncrafterTileEntity) player.level.getBlockEntity(this.pos));
 		this.playerInventory = new InvWrapper(playerInventory);
-		this.outputItems = new OutputHandler(9, this);
-		this.inputItems = new InputHandler(1, this);
-		this.enchantmentHandler = new EnchantmentHandler(6);
+		this.outputItems = this.uncrafter.getOutput();
+		this.inputItems = this.uncrafter.getInput();
+		this.enchantmentHandler = this.uncrafter.getEnchantmentOutput();
 
 		//layout input inventory
 		addSlot(new SlotItemHandler(this.inputItems, 0, 12, 35) {
 			@Override
 			public boolean mayPlace(@Nonnull ItemStack stack) {
-				if (stack.getItem().getRegistryName() == null) {
-					return false;
-				}
-				String name = stack.getItem().getRegistryName().toString();
-				if (Configuration.WHITELIST.get().isEmpty()) {
-					return !Configuration.BLACKLIST.get().contains(name) && !Configuration.IMC_BLACKLIST.contains(name);
-				}
-				return Configuration.WHITELIST.get().contains(name);
+				return Configuration.isValidItem(stack.getItem());
 			}
 
 			@Override
 			public boolean mayPickup(PlayerEntity playerIn) {
-				return !AdvancedUncrafterContainer.this.isInputLocked() && super.mayPickup(playerIn);
+				return !AdvancedUncrafterContainer.this.uncrafter.isInputLocked() && super.mayPickup(playerIn);
 			}
 		});
 		//layout output inventory
@@ -100,19 +97,25 @@ public class AdvancedUncrafterContainer extends Container implements IUncrafterC
 	}
 
 	@Override
-	public void removed(PlayerEntity player) {
-		if (player instanceof ServerPlayerEntity) {
-			ItemStack itemstack = this.inputItems.extractItem(0, 64, false);
-			if (!itemstack.isEmpty()) {
-				if (!this.outputItems.isExtracting()) {
-					if (player.isAlive() && !((ServerPlayerEntity) player).hasDisconnected()) {
-						player.inventory.placeItemBackInInventory(this.player.level, itemstack);
-					} else {
-						player.drop(itemstack, false);
+	public ItemStack clicked(int index, int quickCraft, ClickType clickType, PlayerEntity player) {
+		if (1 <= index && index < 10) {
+			int maxExtract = this.uncrafter.isAdvanced() ? Configuration.ADVANCED_EXTRACT_AMOUNT.get() : Configuration.EXTRACT_AMOUNT.get();
+			if (this.outputItems.getStackInSlot(index - 1).isEmpty()) {
+				int n = 0;
+				for (int i = 0; i < 9; i++) {
+					if (this.uncrafter.selected[i]) {
+						n++;
 					}
 				}
+				if (this.uncrafter.selected[index - 1]) {
+					this.uncrafter.selected[index - 1] = false;
+				} else {
+					this.uncrafter.selected[index - 1] = n < maxExtract;
+				}
+				this.uncrafter.setChanged();
 			}
 		}
+		return super.clicked(index, quickCraft, clickType, player);
 	}
 
 	@Override
@@ -132,9 +135,15 @@ public class AdvancedUncrafterContainer extends Container implements IUncrafterC
 					}
 				}
 			} else if (1 <= index && index < 10) {// shift-click in output slots
-				// nothing happens
+				if (!this.moveItemStackTo(slotStack, 10, 46, true)) {
+					return ItemStack.EMPTY;
+				}
+				outputItems.extractItem(index - 1, 1, false);
+				return ItemStack.EMPTY;
 			} else if (10 <= index && index < 16) {// shift-click in enchantment slots
-				// nothing happens
+				if (!this.moveItemStackTo(slotStack, 10, 46, true)) {
+					return ItemStack.EMPTY;
+				}
 			} else if (index < 52) {// shift-click in inventory slots
 				if (!slots.get(0).hasItem() || slotStack.sameItem(slots.get(0).getItem())) {//shift click from inventory
 					if (!this.moveItemStackTo(slotStack, 0, 1, false)) {
@@ -157,54 +166,12 @@ public class AdvancedUncrafterContainer extends Container implements IUncrafterC
 		return itemstack;
 	}
 
-	@Override
-	public boolean canTakeItemForPickAll(ItemStack pStack, Slot pSlot) {
-		return false;
-	}
-
-	@Override
 	public boolean isInputLocked() {
-		return this.outputItems.isExtracting() || this.enchantmentHandler.isExtracting();
+		return this.uncrafter.isInputLocked();
 	}
 
-	@Override
-	public OutputHandler getOutputHandler() {
-		return this.outputItems;
-	}
-
-	@Override
-	public InputHandler getInputHandler() {
-		return this.inputItems;
-	}
-
-	@Override
-	public EnchantmentHandler getEnchantmentHandler() {
-		return this.enchantmentHandler;
-	}
-
-	@Override
-	public Tuple<ItemStack, List<ItemStack>> getCache() {
-		return this.cache;
-	}
-
-	@Override
-	public void setCache(List<ItemStack> b) {
-		this.cache = new Tuple<>(cache.getA(), b);
-	}
-
-	@Override
-	public void setCache(ItemStack a, List<ItemStack> b) {
-		this.cache = new Tuple<>(a, b);
-	}
-
-	@Override
-	public RecipeManager getRecipeManager() {
-		return this.player.level.getRecipeManager();
-	}
-
-	@Override
-	public boolean isAdvanced() {
-		return true;
+	public boolean[] selectedIndexes() {
+		return this.uncrafter.selected;
 	}
 
 }

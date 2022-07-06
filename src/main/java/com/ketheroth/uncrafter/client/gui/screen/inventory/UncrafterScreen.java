@@ -22,22 +22,31 @@ public class UncrafterScreen extends ContainerScreen<UncrafterContainer> {
 		this.renderBackground(poseStack);
 		super.render(poseStack, mouseX, mouseY, partialTicks);
 		this.renderTooltip(poseStack, mouseX, mouseY);
+		if (this.menu.isInputLocked()) {
+			RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+			this.minecraft.getTextureManager().bind(GUI);
+			this.blit(poseStack, this.leftPos + 28, this.topPos + 51, 176, 0, 3, 3);
+		}
 	}
 
 	@Override
 	protected void renderLabels(MatrixStack poseStack, int x, int y) {
 		super.renderLabels(poseStack, x, y);
 		this.font.draw(poseStack, this.title, this.titleLabelX, this.titleLabelY, 4210752);
-		this.font.draw(poseStack, inventory.getDisplayName(), this.inventoryLabelX, this.inventoryLabelY, 4210752);
+		this.font.draw(poseStack, this.inventory.getDisplayName(), this.inventoryLabelX, this.inventoryLabelY, 4210752);
 	}
 
 	@Override
 	protected void renderBg(MatrixStack poseStack, float partialTicks, int x, int y) {
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		this.minecraft.getTextureManager().bind(GUI);
-		int relX = (this.width - this.imageWidth) / 2;
-		int relY = (this.height - this.imageHeight) / 2;
-		this.blit(poseStack, relX, relY, 0, 0, this.imageWidth, this.imageHeight);
+		this.blit(poseStack, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+		boolean[] selected = this.menu.selectedIndexes();
+		for (int i = 0; i < selected.length; i++) {
+			if (selected[i]) {
+				this.blit(poseStack, this.leftPos + 93 + i%3 *18, this.topPos + 17 + i/3*18, 176, 3, 16, 16);
+			}
+		}
 	}
 
 }

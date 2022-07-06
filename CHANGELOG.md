@@ -3,9 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## Unreleased
+## 1.16.5-1.1.0
 
 ### Added
+- shift-click in output slot
+- tile-entity to the uncrafter. You can now use container to auto import/export
 - Italian translation (thanks to SimGitHub5)
 
 ## 1.16.5-1.0.0

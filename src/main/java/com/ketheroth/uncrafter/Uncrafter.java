@@ -5,6 +5,7 @@ import com.ketheroth.uncrafter.client.gui.screen.inventory.UncrafterScreen;
 import com.ketheroth.uncrafter.common.config.Configuration;
 import com.ketheroth.uncrafter.core.registry.UncrafterBlocks;
 import com.ketheroth.uncrafter.core.registry.UncrafterContainerTypes;
+import com.ketheroth.uncrafter.core.registry.UncrafterTileEntities;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -35,6 +36,7 @@ public class Uncrafter {
 
 		UncrafterBlocks.BLOCKS.register(modEventBus);
 		UncrafterBlocks.ITEMS.register(modEventBus);
+		UncrafterTileEntities.TILE_ENTITIES.register(modEventBus);
 		UncrafterContainerTypes.CONTAINERS.register(modEventBus);
 
 		MinecraftForge.EVENT_BUS.register(this);

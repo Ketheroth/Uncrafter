@@ -1,6 +1,7 @@
 package com.ketheroth.uncrafter.common.inventory.container;
 
 import com.ketheroth.uncrafter.common.config.Configuration;
+import com.ketheroth.uncrafter.common.tileentity.UncrafterTileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
@@ -19,11 +20,11 @@ import java.util.Random;
 
 public class InputHandler extends ItemStackHandler {
 
-	private final IUncrafterContainer container;
+	private final UncrafterTileEntity uncrafterTileEntity;
 
-	public InputHandler(int size, IUncrafterContainer container) {
+	public InputHandler(int size, UncrafterTileEntity uncrafterTileEntity) {
 		super(size);
-		this.container = container;
+		this.uncrafterTileEntity = uncrafterTileEntity;
 	}
 
 	@Nonnull
@@ -31,7 +32,7 @@ public class InputHandler extends ItemStackHandler {
 	public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
 		//when an item is inserted, we set the output slots, then we insert the stack in the input
 		for (int i = 0; i < 9; i++) {
-			container.getOutputHandler().setStackInSlot(i, ItemStack.EMPTY);
+			uncrafterTileEntity.getOutput().setStackInSlot(i, ItemStack.EMPTY);
 		}
 		this.fillOutputSlots(stack);
 		return super.insertItem(slot, stack, simulate);
@@ -46,7 +47,7 @@ public class InputHandler extends ItemStackHandler {
 		//then we remove the items from the input stack
 		if (!simulate) {
 			for (int i = 0; i < 9; i++) {
-				container.getOutputHandler().setStackInSlot(i, ItemStack.EMPTY);
+				uncrafterTileEntity.getOutput().setStackInSlot(i, ItemStack.EMPTY);
 			}
 			if (this.getStackInSlot(slot).getCount() > amount) {
 				this.fillOutputSlots(this.getStackInSlot(0));
@@ -57,21 +58,21 @@ public class InputHandler extends ItemStackHandler {
 
 	public void fillOutputSlots(ItemStack inputStack) {
 		// search ingredient for input item
-		if (!inputStack.sameItem(container.getCache().getA())) {
-			IRecipe<?> recipe = searchRecipe(inputStack, container.getRecipeManager());
+		if (!inputStack.sameItem(uncrafterTileEntity.getCache().getA())) {
+			IRecipe<?> recipe = searchRecipe(inputStack, uncrafterTileEntity.getRecipeManager());
 			if (recipe != null) {
 				List<ItemStack> list = convertTo3x3(recipe).stream().collect(ArrayList::new,
 						(accumulator, ingredient) -> accumulator.add(ingredient.isEmpty() ? ItemStack.EMPTY : ingredient.getItems()[0]),
 						ArrayList::addAll);
-				container.setCache(inputStack, list);
+				uncrafterTileEntity.setCache(inputStack, list);
 			} else {
-				container.setCache(new ArrayList<>());
+				uncrafterTileEntity.setCache(new ArrayList<>());
 			}
 		}
 		// fill output slots with ingredients
 		int index = 0;
-		for (ItemStack ingredient : container.getCache().getB()) {
-			container.getOutputHandler().setStackInSlot(index, ingredient.copy());
+		for (ItemStack ingredient : uncrafterTileEntity.getCache().getB()) {
+			uncrafterTileEntity.getOutput().setStackInSlot(index, ingredient.copy());
 			index++;
 		}
 	}
@@ -120,7 +121,6 @@ public class InputHandler extends ItemStackHandler {
 		Item inputItem = input.getItem();
 		Optional<IRecipe<?>> optionalRecipe = recipeManager.getRecipes().stream()
 				.filter(recipe -> recipe.getType().equals(IRecipeType.CRAFTING))
-//				.filter(recipe -> !Configuration.BLACKLIST.get().contains(recipe.getId().toString()))
 				.filter(recipe -> !Configuration.IMC_BLACKLIST.contains(recipe.getId().toString()))
 				.filter(recipe -> recipe.canCraftInDimensions(3, 3)
 						&& recipe.getResultItem().getItem() == inputItem
