@@ -26,6 +26,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+
 @SuppressWarnings("deprecation")
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -53,7 +55,7 @@ public class AdvancedUncrafterBlock extends Block implements EntityBlock {
 			}
 		};
 
-		NetworkHooks.openGui((ServerPlayer) player, provider, buf -> buf.writeBlockPos(pos));
+		NetworkHooks.openScreen((ServerPlayer) player, provider, buf -> buf.writeBlockPos(pos));
 		return InteractionResult.SUCCESS;
 	}
 

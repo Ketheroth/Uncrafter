@@ -9,7 +9,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class UncrafterBlockEntities {
 
-	public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, Uncrafter.MODID);
+	public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, Uncrafter.MODID);
 
 	public static final RegistryObject<BlockEntityType<UncrafterBlockEntity>> UNCRAFTER = BLOCK_ENTITIES.register("uncrafter",
 			() -> BlockEntityType.Builder.of(UncrafterBlockEntity::new, UncrafterBlocks.UNCRAFTER_BLOCK.get(), UncrafterBlocks.ADVANCED_UNCRAFTER_BLOCK.get()).build(null));

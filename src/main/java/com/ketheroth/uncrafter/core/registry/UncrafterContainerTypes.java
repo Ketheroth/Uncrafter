@@ -11,7 +11,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class UncrafterContainerTypes {
 
-	public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.CONTAINERS, Uncrafter.MODID);
+	public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.MENU_TYPES, Uncrafter.MODID);
 
 	public static final RegistryObject<MenuType<UncrafterContainer>> UNCRAFTER_CONTAINER = CONTAINERS.register("uncrafter_container",
 			() -> IForgeMenuType.create((windowId, inv, data) -> new UncrafterContainer(windowId, inv, inv.player, data.readBlockPos())));
